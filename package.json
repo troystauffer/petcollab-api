@@ -1,0 +1,22 @@
+{
+  "name": "petcollab-api",
+  "version": "0.0.1",
+  "description": "The Node/Express API for the rescue animal transportation app.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/troystauffer/petcollab-api.git"
+  },
+  "author": "Troy Stauffer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/troystauffer/petcollab-api/issues"
+  },
+  "homepage": "https://github.com/troystauffer/petcollab-api#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
