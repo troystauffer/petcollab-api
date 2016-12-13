@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/troystauffer/petcollab-api#readme",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "bunyan": "^1.8.5",
     "chai": "^3.5.0",
     "express": "^4.14.0",
