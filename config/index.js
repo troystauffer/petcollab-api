@@ -3,6 +3,10 @@ const _ = require('lodash');
 
 module.exports = function(){
   let defaults = {
+    facebook: {
+      'clientID': process.env.FACEBOOK_CLIENT_ID,
+      'clientSecret': process.env.FACEBOOK_CLIENT_SECRET
+    }
   };
 
   switch(process.env.NODE_ENV){
@@ -14,7 +18,7 @@ module.exports = function(){
           'dialect': 'sqlite',
           'storage': './kite-db.development.sqlite',
           'logging': false
-        }, 
+        },
         log: {
           name: 'petcollab-api-dev',
           streams: [
