@@ -21,22 +21,27 @@
     "body-parser": "^1.15.2",
     "bunyan": "^1.8.5",
     "chai": "^3.5.0",
+    "connect-mongodb": "^1.1.5",
+    "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "express-jwt": "^5.1.0",
+    "express-session": "^1.14.2",
     "express-validator": "^3.0.0",
     "jasmine": "^2.5.2",
     "lodash": "^4.17.2",
+    "mongodb": "^2.2.16",
+    "mongoose": "^4.7.2",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "pg": "^6.1.1",
     "pg-hstore": "^2.3.2",
     "pg-native": "^1.10.0",
     "sequelize": "^3.27.0",
-    "sequelize-cli": "^2.5.1",
     "supertest": "^2.0.1"
   },
   "devDependencies": {
     "eslint": "^1.9.0",
+    "sequelize-cli": "^2.5.1",
     "sqlite3": "^3.1.0"
   }
 }

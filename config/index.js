@@ -4,9 +4,12 @@ const _ = require('lodash');
 module.exports = function(){
   let defaults = {
     facebook: {
-      'clientID': process.env.FACEBOOK_CLIENT_ID,
-      'clientSecret': process.env.FACEBOOK_CLIENT_SECRET
-    }
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      callbackURL: 'http://localhost:3300/v1/auth/facebook/return'
+    },
+    sessionKey: process.env.SESSION_KEY,
+    mongodbName: 'petcollab-mongodb'
   };
 
   switch(process.env.NODE_ENV){
@@ -15,9 +18,9 @@ module.exports = function(){
       return _.assign(defaults, {
         port: process.env.PORT || 3300,
         database: {
-          'dialect': 'sqlite',
-          'storage': './kite-db.development.sqlite',
-          'logging': false
+          dialect: 'sqlite',
+          storage: './petcollab-db.development.sqlite',
+          logging: false
         },
         log: {
           name: 'petcollab-api-dev',
@@ -38,8 +41,8 @@ module.exports = function(){
       return _.assign(defaults, {
         port: process.env.PORT || 3000,
         database: {
-          'dialect': 'sqlite',
-          'storage': './kite-db.test.sqlite',
+          dialect: 'sqlite',
+          storage: './petcollab-db.test.sqlite',
           logging: false
         }, 
         log: {
@@ -53,15 +56,15 @@ module.exports = function(){
       return _.assign(defaults, {
         port: process.env.PORT,
         database: {
-          'use_env_variable': 'POSTGRES_CONNECTION_STRING',
-          'dialect': 'postgres',
-          'protocol': 'postgres',
-          'native': true,
-          'ssl': true,
-          'dialectOptions': {
+          use_env_variable: 'POSTGRES_CONNECTION_STRING',
+          dialect: 'postgres',
+          protocol: 'postgres',
+          native: true,
+          ssl: true,
+          dialectOptions: {
             'ssl': true
           },
-          'logging': false
+          logging: false
         }, 
         log: {
           name: 'petcollab-api',
@@ -75,6 +78,9 @@ module.exports = function(){
               stream: process.stderr
             }
           ]
+        },
+        facebook: {
+          callbackURL: 'https://petcollab-api.herokuapps.com/v1/user/info'
         }
       });
   }
