@@ -82,7 +82,7 @@ module.exports = function(){
         facebook: {
           clientID: process.env.FACEBOOK_CLIENT_ID,
           clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-          callbackURL: 'https://petcollab-api.herokuapps.com/v1/user/info'
+          callbackURL: 'https://petcollab-api.herokuapps.com/auth/facebook/return'
         }
       });
   }
