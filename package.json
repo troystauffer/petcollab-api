@@ -19,6 +19,7 @@
   "homepage": "https://github.com/troystauffer/petcollab-api#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "bson-ext": "^1.0.1",
     "bunyan": "^1.8.5",
     "chai": "^3.5.0",
     "connect-mongodb": "^1.1.5",
