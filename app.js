@@ -1,25 +1,31 @@
 'use strict';
 
-const express = require('express');
 const path = require('path');
+// framework
+const express = require('express');
 const app = express();
-const bodyparser = require('body-parser');
-const cookieparser = require('cookie-parser');
-const config = new (require(path.join(__dirname, 'config/')));
-const log = (require('bunyan')).createLogger(config.log);
-const validator = require('express-validator');
 const router = express.Router();
+const validator = require('express-validator');
+// configuration
+const config = new (require(path.join(__dirname, 'config/')));
 const unsecuredRoutes = require(path.join(__dirname, 'config/unsecured_routes'));
-const db = new (require(path.join(__dirname, 'models/')))(config.database);
+// utils
+const bodyparser = require('body-parser');
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
+const jwt = require('jsonwebtoken');
+// persistance
+const db = new (require(path.join(__dirname, 'models/')))(config.database);
 const redis = require('redis');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
+// security
 const EasyPbkdf2 = require('easy-pbkdf2');
 const pwcrypt = EasyPbkdf2(config.easyPbkdf2);
+// logging
+const log = (require('bunyan')).createLogger(config.log);
 const morgan = require('morgan');
-const jwt = require('jsonwebtoken');
+// custom middleware
 const authorized = require(path.join(__dirname, 'lib/authorized'))(jwt, config.sessionKey);
 
 function App() {
@@ -27,12 +33,10 @@ function App() {
   let self = this;
   app.use(bodyparser.urlencoded({ extended: true }));
   app.use(bodyparser.json());
-  app.use(cookieparser());
   app.use(validator());
   app.use(morgan(config.morgan.format, config.morgan.options));
   app.use('/v1', router);
 
-  // router.use(jwt({secret:config.stormpath.secret}).unless({path: unsecuredRoutes}));
   router.use(authorized.unless({ path: unsecuredRoutes }));
 
   // define routes
