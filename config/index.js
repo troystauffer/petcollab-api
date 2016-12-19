@@ -10,7 +10,7 @@ module.exports = function(){
     },
     sessionKey: process.env.SESSION_KEY,
     easyPbkdf2: {
-      DEFAULT_HASH_ITERATIONS: 10000,
+      DEFAULT_HASH_ITERATIONS: 10,
       SALT_SIZE: 32,
       KEY_LENGTH: 256
     }
@@ -39,10 +39,11 @@ module.exports = function(){
             }
           ]
         },
-        easyPbkdf2: {
-          DEFAULT_HASH_ITERATIONS: 10,
-          SALT_SIZE: 32,
-          KEY_LENGTH: 256
+        morgan: {
+          format: 'dev',
+          options: {
+            skip: function (req, res) { return req.url == '/favicon.ico' }
+          }
         }
       });
 
@@ -58,6 +59,12 @@ module.exports = function(){
           name: 'petcollab-api-test',
           level: 'error',
           stream: process.stdout
+        },
+        morgan: {
+          format: 'dev',
+          options: {
+            skip: function (req, res) { return true }
+          }
         }
       });
 
@@ -92,6 +99,15 @@ module.exports = function(){
           clientID: process.env.FACEBOOK_CLIENT_ID,
           clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
           callbackURL: 'https://petcollab-api.herokuapp.com/v1/auth/facebook/return'
+        },
+        easyPbkdf2: {
+          DEFAULT_HASH_ITERATIONS: 10000,
+          SALT_SIZE: 32,
+          KEY_LENGTH: 256
+        },
+        morgan: {
+          format: 'combined',
+          options: {}
         }
       });
   }

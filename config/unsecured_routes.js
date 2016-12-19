@@ -2,8 +2,8 @@
 
 function unsecuredRoutes() {
   return [
-    '/v1/auth/facebook',
-    '/v1/test'
+    '/v1/auth',
+    '/v1/user/error'
   ];
 }
 
