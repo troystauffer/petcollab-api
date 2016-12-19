@@ -9,7 +9,11 @@ module.exports = function(){
       callbackURL: 'http://localhost:3300/v1/auth/facebook/return'
     },
     sessionKey: process.env.SESSION_KEY,
-    mongodbName: 'petcollab-mongodb'
+    easyPbkdf2: {
+      DEFAULT_HASH_ITERATIONS: 10000,
+      SALT_SIZE: 32,
+      KEY_LENGTH: 256
+    }
   };
 
   switch(process.env.NODE_ENV){
@@ -34,6 +38,11 @@ module.exports = function(){
               stream: process.stdout
             }
           ]
+        },
+        easyPbkdf2: {
+          DEFAULT_HASH_ITERATIONS: 10,
+          SALT_SIZE: 32,
+          KEY_LENGTH: 256
         }
       });
 
@@ -82,7 +91,7 @@ module.exports = function(){
         facebook: {
           clientID: process.env.FACEBOOK_CLIENT_ID,
           clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-          callbackURL: 'https://petcollab-api.herokuapp.com/auth/facebook/return'
+          callbackURL: 'https://petcollab-api.herokuapp.com/v1/auth/facebook/return'
         }
       });
   }

@@ -15,10 +15,11 @@ const unsecuredRoutes = require(path.join(__dirname, 'config/unsecured_routes'))
 const db = new (require(path.join(__dirname, 'models/')))(config.database);
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
+const redis = require('redis');
 const expressSession = require('express-session');
-const mongoose = require('mongoose');
-const MongoStore = require('connect-mongodb');
-const mongodb = require('mongodb');
+const RedisStore = require('connect-redis')(expressSession);
+const EasyPbkdf2 = require('easy-pbkdf2');
+const pwcrypt = EasyPbkdf2(config.easyPbkdf2)
 
 function App() {
   EventEmitter.call(this);
@@ -27,22 +28,8 @@ function App() {
     secret: config.sessionKey,
     resave: false,
     saveUninitialized: true,
-    store: new MongoStore({
-      db: mongodb.Db(
-        config.mongodbName,
-        new mongodb.Server(
-          'localhost',
-          27017,
-          { auto_reconnect: true, native_parser: true }
-        ),
-        { journal: true }
-      )
-    },
-    function(error) {
-      if (error) return log.error('Failed connecting mongostore for storing session data.', error.stack);
-      return log.info('Connected mongostore for storing session data');
-    }
-  )}));
+    store: new RedisStore({ client: redis.createClient() })
+  }));
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(bodyparser.urlencoded({ extended: true }));
@@ -60,7 +47,8 @@ function App() {
 
 
   // define routes
-  require(path.join(__dirname, 'routes/user'))(router, passport, db, config.facebook, log);
+  require(path.join(__dirname, 'routes/user'))(router, db, pwcrypt, log);
+  require(path.join(__dirname, 'routes/auth'))(router, passport, db, pwcrypt, log);
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');
