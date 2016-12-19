@@ -8,7 +8,13 @@
     "storage": "./petcollab-db.development.sqlite"
   },
   "production": {
+    "use_env_variable": "POSTGRES_CONNECTION_STRING",
     "dialect": "postgres",
-    "use_env_variable": "POSTGRES_CONNECTION_STRING"
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": {
+        "require": true
+      }
+    }
   }
 }
