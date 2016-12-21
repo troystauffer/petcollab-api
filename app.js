@@ -13,7 +13,7 @@ const unsecuredRoutes = require(path.join(__dirname, 'config/unsecured_routes'))
 const bodyparser = require('body-parser');
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
-const jwt = require('jsonwebtoken');
+const jws = require('jws');
 // persistance
 const db = new (require(path.join(__dirname, 'models/')))(config.database);
 const redis = require('redis');
@@ -26,7 +26,7 @@ const pwcrypt = EasyPbkdf2(config.easyPbkdf2);
 const log = (require('bunyan')).createLogger(config.log);
 const morgan = require('morgan');
 // custom middleware
-const authorized = require(path.join(__dirname, 'lib/authorized'))(jwt, config.sessionKey);
+const authorized = require(path.join(__dirname, 'lib/authorized'))(jws, config.jws);
 
 function App() {
   EventEmitter.call(this);
@@ -41,7 +41,7 @@ function App() {
 
   // define routes
   require(path.join(__dirname, 'routes/user'))(router, db, pwcrypt, log);
-  require(path.join(__dirname, 'routes/auth'))(router, db, pwcrypt, jwt, config, log);
+  require(path.join(__dirname, 'routes/auth'))(router, db, pwcrypt, jws, config, log);
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');

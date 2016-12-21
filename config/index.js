@@ -6,9 +6,13 @@ module.exports = function(){
     facebook: {
       clientID: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3300/v1/auth/facebook/return'
+      redirectUri: 'http://localhost:3000/auth/facebook/return',
+      ogurl: 'graph.facebook.com'
     },
-    sessionKey: process.env.SESSION_KEY,
+    jws: {
+      key: process.env.SESSION_KEY,
+      algorithm: 'HS256'
+    },
     easyPbkdf2: {
       DEFAULT_HASH_ITERATIONS: 10,
       SALT_SIZE: 32,
@@ -98,7 +102,8 @@ module.exports = function(){
         facebook: {
           clientID: process.env.FACEBOOK_CLIENT_ID,
           clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-          callbackURL: 'https://petcollab-api.herokuapp.com/v1/auth/facebook/return'
+          redirectUri: 'https://petcollab.herokuapp.com/auth/facebook/return',
+          ogurl: 'graph.facebook.com'
         },
         easyPbkdf2: {
           DEFAULT_HASH_ITERATIONS: 10000,

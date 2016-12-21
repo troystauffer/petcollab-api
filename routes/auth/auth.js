@@ -4,14 +4,15 @@ let db = {};
 let log = {};
 let config = {};
 let pwcrypt = {};
-let jwt = {};
+let jws = {};
+const https = require('https');
 
-function Auth(_db,  _pwcrypt, _jwt, _config, _log) {
+function Auth(_db,  _pwcrypt, _jws, _config, _log) {
   db = _db;
   log = _log;
   config = _config;
   pwcrypt = _pwcrypt;
-  jwt = _jwt;
+  jws = _jws;
   return this;
 };
 
@@ -27,12 +28,64 @@ Auth.prototype.auth = function(req, res) {
     pwcrypt.verify( user.salt, user.password_hash, req.body.password, function( err, valid ) {
       if (err) return res.status(500).json({ message: 'An error occurred decrypting the password.', errors: err });
       if (!valid) return res.status(400).json({ message: 'Invalid password.' });
-      jwt.sign({ user_id: user.id }, config.sessionKey, { expiresIn: '24h' }, function(err, token) {
-        if (err) return res.status(500).json({ message: 'Unable to generate token.' });
-        return res.status(200).json({ message: 'Authenticated successfully.', token: token });
-      })
+      generateToken({ user_id: user.id }, function(status, json) { return res.status(status).json(json); });
     });
   });
 };
+
+Auth.prototype.facebook = function(req, res) {
+  req.checkBody('code', 'A facebook auth code is required.').notEmpty();
+  let errors = req.validationErrors();
+  if (errors) return res.status(400).json({ message: 'The data provided to the API was invalid or incomplete.', errors: errors });
+  httpsRequest({
+    host: config.facebook.ogurl,
+    path: '/v2.8/oauth/access_token?client_id=' + config.facebook.clientID + '&client_secret=' + config.facebook.clientSecret + '&code=' + req.body.code + '&redirect_uri=' + config.facebook.redirectUri
+  }, function(validation) {
+    if (validation.error && validation.error.code == 190) return res.status(403).json({ message: 'Invalid facebook code.' });
+    if (validation.error || !validation.access_token) return res.status(500).json({ message: 'An error occurred validating the facebook code.' });
+    httpsRequest({
+      host: config.facebook.ogurl,
+      path: '/me?access_token=' + validation.access_token
+    }, function(fbuser) {
+      db.User.findOrCreate({ where: { facebook_id: fbuser.id }})
+      .spread(function(user, created) {
+        if (created) {
+          user.name = fbuser.name;
+          user.email = fbuser.email;
+          user.save()
+          .then(function() {
+            generateToken({ user_id: user.id, facebook_access_token: validation.access_token }, function(status, json) { return res.status(status).json(json); });
+          })
+          .catch(function(err) {
+            return res.status(500).json({ message: 'An error occurred creating the account.', errors: err });
+          });
+        } else {
+          generateToken({ user_id: user.id, facebook_access_token: validation.access_token }, function(status, json) { return res.status(status).json(json); });
+        }
+      });
+    });
+  });
+};
+
+function generateToken(data, cb) {
+  const token = jws.sign({
+    header: { alg: config.jws.algorithm },
+    payload: data,
+    secret: config.jws.key
+  });
+  cb(200, { message: 'Authenticated successfully.', token: token })
+}
+
+function httpsRequest(options, cb) {
+  https.request(options, function(response) {
+    let str = '';
+    response.on('data', function (chunk) {
+      str += chunk;
+    });
+    response.on('end', function () {
+      cb(JSON.parse(str));
+    });
+  }).end();
+}
 
 module.exports = Auth;
