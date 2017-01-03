@@ -1,11 +1,13 @@
 'use strict';
 
-function unsecuredRoutes() {
+function unsecuredRoutes(apiPrefix) {
   return [
-    '/v1/auth',
-    '/v1/auth/facebook',
-    '/v1/user/error'
+    apiPrefix + '/auth',
+    apiPrefix + '/auth/facebook',
+    apiPrefix + '/user/error',
+    apiPrefix + '/user/fields',
+    apiPrefix + '/user/create'
   ];
 }
 
-module.exports = new unsecuredRoutes();
+module.exports = unsecuredRoutes;

@@ -17,7 +17,8 @@ module.exports = function(){
       DEFAULT_HASH_ITERATIONS: 10,
       SALT_SIZE: 32,
       KEY_LENGTH: 256
-    }
+    },
+    apiPrefix: '/v1'
   };
 
   switch(process.env.NODE_ENV){

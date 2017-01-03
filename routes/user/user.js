@@ -3,6 +3,7 @@
 let log = {};
 let db = {};
 let pwcrypt = {};
+const _ = require('lodash');
 
 function User(_db, _pwcrypt, _log) {
   db = _db;
@@ -46,6 +47,14 @@ User.prototype.info = function(req, res) {
 User.prototype.error = function(req, res) {
   return res.status(400).json({
     message: 'An error occurrred.'
+  });
+};
+
+User.prototype.fields = function(req, res) {
+  db.User.describe().then(function(table) {
+    var obj = _.omit(table, ["id", "facebook_id", "createdAt", "updatedAt", "password_hash", "salt"]);
+    obj["password"] = { "type": "password", "allowNull": false, "primaryKey": false };
+    return res.json(obj);
   });
 };
 

@@ -8,7 +8,7 @@ const router = express.Router();
 const validator = require('express-validator');
 // configuration
 const config = new (require(path.join(__dirname, 'config/')));
-const unsecuredRoutes = require(path.join(__dirname, 'config/unsecured_routes'));
+const unsecuredRoutes = require(path.join(__dirname, 'config/unsecured_routes'))(config.apiPrefix);
 // utils
 const bodyparser = require('body-parser');
 const EventEmitter = require('events').EventEmitter;
@@ -35,7 +35,7 @@ function App() {
   app.use(bodyparser.json());
   app.use(validator());
   app.use(morgan(config.morgan.format, config.morgan.options));
-  app.use('/v1', router);
+  app.use(config.apiPrefix, router);
 
   router.use(authorized.unless({ path: unsecuredRoutes }));
 
