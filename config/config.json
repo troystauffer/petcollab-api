@@ -5,7 +5,7 @@
   },
   "test": {
     "dialect": "sqlite",
-    "storage": "./petcollab-db.development.sqlite"
+    "storage": "./petcollab-db.test.sqlite"
   },
   "production": {
     "use_env_variable": "POSTGRES_CONNECTION_STRING",

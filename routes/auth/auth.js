@@ -28,7 +28,7 @@ Auth.prototype.auth = function(req, res) {
     pwcrypt.verify( user.salt, user.password_hash, req.body.password, function( err, valid ) {
       if (err) return res.status(500).json({ message: 'An error occurred decrypting the password.', errors: err });
       if (!valid) return res.status(400).json({ message: 'Invalid password.' });
-      generateToken({ user_id: user.id }, function(status, json) { return res.status(status).json(json); });
+      generateToken({ user_id: user.id, email: user.email, name: user.name }, function(status, json) { return res.status(status).json(json); });
     });
   });
 };

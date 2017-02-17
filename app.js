@@ -22,6 +22,7 @@ const RedisStore = require('connect-redis')(expressSession);
 // security
 const EasyPbkdf2 = require('easy-pbkdf2');
 const pwcrypt = EasyPbkdf2(config.easyPbkdf2);
+const UserToken = new (require(path.join(__dirname, 'lib/user_token')))(db);
 // logging
 const log = (require('bunyan')).createLogger(config.log);
 const morgan = require('morgan');
@@ -40,7 +41,7 @@ function App() {
   router.use(authorized.unless({ path: unsecuredRoutes }));
 
   // define routes
-  require(path.join(__dirname, 'routes/user'))(router, db, pwcrypt, log);
+  require(path.join(__dirname, 'routes/user'))(router, db, pwcrypt, config, UserToken, log);
   require(path.join(__dirname, 'routes/auth'))(router, db, pwcrypt, jws, config, log);
 
   let server = app.listen(config.port);

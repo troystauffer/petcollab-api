@@ -18,7 +18,8 @@ module.exports = function(){
       SALT_SIZE: 32,
       KEY_LENGTH: 256
     },
-    apiPrefix: '/v1'
+    apiPrefix: '/v1',
+    confirmationTokenLength: 6
   };
 
   switch(process.env.NODE_ENV){

@@ -2,11 +2,12 @@
 
 function unsecuredRoutes(apiPrefix) {
   return [
-    apiPrefix + '/auth',
-    apiPrefix + '/auth/facebook',
-    apiPrefix + '/user/error',
-    apiPrefix + '/user/fields',
-    apiPrefix + '/user/create'
+    { url: apiPrefix + '/auth', methods: ['POST'] },
+    { url: apiPrefix + '/auth/facebook', methods: ['POST'] },
+    { url: apiPrefix + '/user/error', methods: ['GET'] },
+    { url: apiPrefix + '/user/fields', methods: ['GET'] },
+    { url: apiPrefix + '/user', methods: ['POST'] },
+    { url: apiPrefix + '/user/confirm', methods: ['POST'] },
   ];
 }
 
