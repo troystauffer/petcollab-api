@@ -1,8 +1,8 @@
 'use strict';
 const path = require('path');
 
-module.exports = function(router, db, pwcrypt, config, UserToken, log) {
-  const user = new (require(path.join(__dirname, 'user')))(db, pwcrypt, config, UserToken, log);
+module.exports = function(router, args) {
+  const user = new (require(path.join(__dirname, 'user')))(args);
   router.get('/user', user.info);
   router.get('/user/error', user.error);
   router.post('/user', user.create);

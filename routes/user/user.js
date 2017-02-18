@@ -1,19 +1,10 @@
 'use strict';
 
-let log = {};
-let db = {};
-let pwcrypt = {};
-let config = {};
-let UserToken = {};
 const _ = require('lodash');
+let _this = {};
 
-function User(_db, _pwcrypt, _config, _UserToken, _log) {
-  db = _db;
-  pwcrypt = _pwcrypt;
-  config = _config;
-  UserToken = _UserToken;
-  log = _log;
-  return this;
+let User = function(args = {}) {
+  Object.keys(args).map((key) => { _this[key] = args[key]; });
 }
 
 User.prototype.create = function(req, res) {
@@ -23,16 +14,16 @@ User.prototype.create = function(req, res) {
   req.checkBody('name', 'A valid name is required.').notEmpty();
   let errors = req.validationErrors();
   if (errors) return res.status(400).json({ message: 'The data provided to the API was invalid or incomplete.', errors: errors });
-  pwcrypt.secureHash(req.body.password, function( err, passwordHash, salt ) {
+  _this.pwcrypt.secureHash(req.body.password, function( err, passwordHash, salt ) {
     if (err) return res.status(500).json({ message: 'An error occurred.', errors: err });
-    db.User.findOrCreate({ where: { email: req.body.email }})
+    _this.db.User.findOrCreate({ where: { email: req.body.email }})
     .spread(function(user, created) {
       if (!created) return res.status(400).json({ message: 'User with this email already exists.'});
       user.password_hash = passwordHash;
       user.salt = salt;
       user.name = req.body.name;
-      UserToken.generateToken(config.confirmationTokenLength, function(token) {
-        log.info('Confirmation token generated for user ' + user.email + ': ' + token);
+      _this.UserToken.generateToken(_this.config.confirmationTokenLength, function(token) {
+        _this.log.info('Confirmation token generated for user ' + user.email + ': ' + token);
         user.confirmation_token = token;
         user.save()
         .then(function(user) {
@@ -63,7 +54,7 @@ User.prototype.error = function(req, res) {
 };
 
 User.prototype.fields = function(req, res) {
-  db.User.describe().then(function(table) {
+  _this.db.User.describe().then(function(table) {
     var obj = _.omit(table, ["id", "facebook_id", "createdAt", "updatedAt", "password_hash", "salt", "confirmed"]);
     obj["password"] = { "type": "password", "allowNull": false, "primaryKey": false };
     return res.json(obj);
@@ -75,7 +66,7 @@ User.prototype.confirm = function(req, res) {
   req.checkBody('email', 'A valid email is required.').notEmpty().isEmail();
   let errors = req.validationErrors();
   if (errors) return res.status(400).json({ message: 'The data provided to the API was invalid or incomplete.', errors: errors });
-  db.User.findOne({ where: { email: req.body.email, confirmation_token: req.body.confirmation_token }})
+  _this.db.User.findOne({ where: { email: req.body.email, confirmation_token: req.body.confirmation_token }})
   .then(function(user) {
     if (user) {
       user.confirmed = Date();

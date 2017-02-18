@@ -41,8 +41,8 @@ function App() {
   router.use(authorized.unless({ path: unsecuredRoutes }));
 
   // define routes
-  require(path.join(__dirname, 'routes/user'))(router, db, pwcrypt, config, UserToken, log);
-  require(path.join(__dirname, 'routes/auth'))(router, db, pwcrypt, jws, config, log);
+  require(path.join(__dirname, 'routes/user'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log, 'mg': mg });
+  require(path.join(__dirname, 'routes/auth'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log });
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');
