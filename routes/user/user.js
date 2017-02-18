@@ -49,7 +49,7 @@ User.prototype.info = function(req, res) {
 
 User.prototype.error = function(req, res) {
   return res.status(400).json({
-    message: 'An error occurrred.'
+    message: 'An error occurred.'
   });
 };
 
