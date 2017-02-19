@@ -7,6 +7,7 @@ class Req {
     this.isLength = function() { return this };
     this.isBoolean = function() { return this };
     this.isEmail = function() { return this };
+    this.isAlphanumeric = function() { return this };
     this.validationErrors = function() { return null };
     this.user = { user_id: 1 };
   }

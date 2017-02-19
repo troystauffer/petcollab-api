@@ -62,7 +62,7 @@ User.prototype.fields = function(req, res) {
 };
 
 User.prototype.confirm = function(req, res) {
-  req.checkBody('confirmation_token', 'A valid confirmation token is required.').notEmpty().isAlphanumeric().isLength(config.confirmationTokenLength);
+  req.checkBody('confirmation_token', 'A valid confirmation token is required.').notEmpty().isAlphanumeric().isLength(_this.config.confirmationTokenLength);
   req.checkBody('email', 'A valid email is required.').notEmpty().isEmail();
   let errors = req.validationErrors();
   if (errors) return res.status(400).json({ message: 'The data provided to the API was invalid or incomplete.', errors: errors });

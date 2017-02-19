@@ -9,12 +9,26 @@ module.exports = {
     },
     findOrCreate: function() {
       return new Sequelize.Promise(function(resolve, reject) {
-        resolve({id:1});
+        resolve({
+          id: 1,
+          save: function() {
+            return new Sequelize.Promise(function(resolve, reject) {
+              resolve({ id: 1 });
+            });
+          }
+        });
       });
     },
     findOne: function() {
       return new Sequelize.Promise(function(resolve, reject) {
-        resolve({id:1});
+        resolve({
+          id: 1,
+          save: function() {
+            return new Sequelize.Promise(function(resolve, reject) {
+              resolve({ id: 1 });
+            });
+          }
+        });
       });
     },
     describe: function() {
