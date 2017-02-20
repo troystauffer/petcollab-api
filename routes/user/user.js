@@ -32,9 +32,6 @@ User.prototype.create = function(req, res) {
           } else {
             return res.status(500).json({ message: 'An error occurred creating the account.', errors: err });
           }
-        })
-        .catch(function(err) {
-          return res.status(500).json({ message: 'An error occurred creating the account.', errors: err });
         });
       });
     });

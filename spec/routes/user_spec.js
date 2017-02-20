@@ -61,8 +61,8 @@ describe('User', () => {
         email: 'testunit@example.com',
         password: 'password'
       };
-      validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
       req.validationErrors = function() { return [error] };
+      validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
     });
 
     it('should fail without a valid email', () => {

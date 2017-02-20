@@ -16,12 +16,17 @@ Auth.prototype.auth = function(req, res) {
   _this.db.User.findOne({ where: { email: req.body.email }})
   .then(function(user) {
     if (!user) return res.status(400).json({ message: 'No such user.'});
-    _this.pwcrypt.verify( user.salt, user.password_hash, req.body.password, function( err, valid ) {
-      if (err) return res.status(500).json({ message: 'An error occurred decrypting the password.', errors: err });
-      if (!valid) return res.status(400).json({ message: 'Invalid password.' });
-      generateToken({ user_id: user.id, email: user.email, name: user.name }, function(status, json) { return res.status(status).json(json); });
+      try {
+        _this.pwcrypt.verify( user.salt, user.password_hash, req.body.password, function( err, valid ) {
+          if (err) return res.status(500).json({ message: 'An error occurred decrypting the password.', errors: err });
+          if (!valid) return res.status(400).json({ message: 'Invalid password.' });
+          let token = generateToken({ user_id: user.id, email: user.email, name: user.name });
+          return res.status(200).json({ message: 'Authenticated successfully.', token: token });
+        });
+      } catch(err) {
+        return res.status(500).json(err);
+      }
     });
-  });
 };
 
 Auth.prototype.facebook = function(req, res) {
@@ -45,26 +50,27 @@ Auth.prototype.facebook = function(req, res) {
           user.email = fbuser.email;
           user.save()
           .then(function() {
-            generateToken({ user_id: user.id, facebook_access_token: validation.access_token }, function(status, json) { return res.status(status).json(json); });
+            let token = generateToken({ user_id: user.id, facebook_access_token: validation.access_token });
+            return res.status(200).json({ message: 'Authenticated successfully.', token: token });
           })
           .catch(function(err) {
             return res.status(500).json({ message: 'An error occurred creating the account.', errors: err });
           });
         } else {
-          generateToken({ user_id: user.id, facebook_access_token: validation.access_token }, function(status, json) { return res.status(status).json(json); });
+          let token = generateToken({ user_id: user.id, facebook_access_token: validation.access_token });
+          return res.status(200).json({ message: 'Authenticated successfully.', token: token });
         }
       });
     });
   });
 };
 
-function generateToken(data, cb) {
-  const token = _this.jws.sign({
+function generateToken(data) {
+  return _this.jws.sign({
     header: { alg: _this.config.jws.algorithm },
     payload: data,
     secret: _this.config.jws.key
   });
-  cb(200, { message: 'Authenticated successfully.', token: token })
 }
 
 function httpsRequest(options, cb) {

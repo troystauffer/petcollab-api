@@ -1,40 +1,105 @@
-import Sequelize from 'Sequelize';
+let user = {
+  then: function(callback) {
+    callback({
+      id: 1,
+      save: function() {
+        return {
+          then: function(callback) {
+            callback({ id: 1 });
+          }
+        }
+      }
+    });
+  },
+  spread: function(callback) {
+    callback({
+      id: 1,
+      save: function() {
+        return {
+          then: function(callback) {
+            callback({
+              id: 1
+            });
+            return {
+              catch: function(callback) { callback({ error: 'error message' })}
+            }
+          }
+        }
+      }
+    }, true);
+  }
+};
+let userTable = {
+  "id": {
+    "type": "INTEGER",
+    "allowNull": true,
+    "primaryKey": true
+  },
+  "name": {
+    "type": "VARCHAR(255)",
+    "allowNull": true,
+    "primaryKey": false
+  },
+  "facebook_id": {
+    "type": "VARCHAR(255)",
+    "allowNull": true,
+    "primaryKey": false
+  },
+  "created_at": {
+    "type": "DATETIME",
+    "allowNull": false,
+    "primaryKey": false
+  },
+  "updated_at": {
+    "type": "DATETIME",
+    "allowNull": false,
+    "primaryKey": false
+  },
+  "email": {
+    "type": "VARCHAR(255)",
+    "allowNull": true,
+    "primaryKey": false
+  },
+  "password_hash": {
+    "type": "TEXT",
+    "allowNull": true,
+    "primaryKey": false
+  },
+  "salt": {
+    "type": "VARCHAR(255)",
+    "allowNull": true,
+    "primaryKey": false
+  },
+  "confirmed": {
+    "type": "DATETIME",
+    "allowNull": true,
+    "defaultValue": null,
+    "primaryKey": false
+  },
+  "confirmation_token": {
+    "type": "VARCHAR(255)",
+    "allowNull": true,
+    "defaultValue": null,
+    "primaryKey": false
+  }
+}
+let userDescribe = {
+  then: function(callback) { callback(userTable) }
+}
 
 module.exports = {
   User: {
+    findOne: function() {
+      return user;
+    },
     create: function() {
-      return new Sequelize.Promise(function(resolve, reject) {
-        resolve({id:1});
-      });
+      return user;
     },
     findOrCreate: function() {
-      return new Sequelize.Promise(function(resolve, reject) {
-        resolve({
-          id: 1,
-          save: function() {
-            return new Sequelize.Promise(function(resolve, reject) {
-              resolve({ id: 1 });
-            });
-          }
-        });
-      });
-    },
-    findOne: function() {
-      return new Sequelize.Promise(function(resolve, reject) {
-        resolve({
-          id: 1,
-          save: function() {
-            return new Sequelize.Promise(function(resolve, reject) {
-              resolve({ id: 1 });
-            });
-          }
-        });
-      });
+      return user;
     },
     describe: function() {
-      return new Sequelize.Promise(function(resolve, reject) {
-        resolve(userDescribe);
-      })
+      return userDescribe;
     }
   }
 }

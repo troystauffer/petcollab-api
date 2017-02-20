@@ -1,4 +1,3 @@
-class UserToken {
-  generateToken(length, callback) { callback('token') }
+module.exports = {
+  generateToken: function(length, callback) { callback('token') }
 }
-module.exports = UserToken;
