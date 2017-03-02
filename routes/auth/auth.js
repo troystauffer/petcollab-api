@@ -1,7 +1,6 @@
 'use strict';
 
 let _this = {};
-const https = require('https');
 
 let Auth = function(args = {}) {
   Object.keys(args).map((key) => { _this[key] = args[key]; });
@@ -52,9 +51,6 @@ Auth.prototype.facebook = function(req, res) {
           .then(function() {
             let token = generateToken({ user_id: user.id, facebook_access_token: validation.access_token });
             return res.status(200).json({ message: 'Authenticated successfully.', token: token });
-          })
-          .catch(function(err) {
-            return res.status(500).json({ message: 'An error occurred creating the account.', errors: err });
           });
         } else {
           let token = generateToken({ user_id: user.id, facebook_access_token: validation.access_token });
@@ -74,7 +70,7 @@ function generateToken(data) {
 }
 
 function httpsRequest(options, cb) {
-  https.request(options, function(response) {
+  _this.https.request(options, function(response) {
     let str = '';
     response.on('data', function (chunk) {
       str += chunk;

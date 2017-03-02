@@ -3,23 +3,34 @@ import Auth from '../../routes/auth/auth';
 import Res from '../util/res';
 import Req from '../util/req';
 import db from '../util/db';
-import jws from '../util/jws';
+import JWS from '../util/jws';
 import dbFailures from '../util/db_failures';
-import pwcrypt from '../util/pwcrypt';
-import pwcryptError from '../util/pwcrypt_error';
-import pwcryptInvalid from '../util/pwcrypt_invalid';
+import Pwcrypt from '../util/pwcrypt';
+import PwcryptError from '../util/pwcrypt_error';
+import PwcryptInvalid from '../util/pwcrypt_invalid';
 import log from '../util/log';
+import HTTPS from '../util/https';
 
 describe('Auth', () => {
   let res = {};
   let req = {};
   let authRoutes = {};
-  const config = { 'facebook': { 'ogurl': '' }, jws: { algorithm: 'fake' }};
+  let pwcrypt = {};
+  let pwcryptError = {};
+  let pwcryptInvalid = {};
+  let https = {};
+  let jws = {};
+  const config = { 'facebook': { 'ogurl': '', 'clientID': '', 'clientSecret': '', 'redirectUri': '' }, jws: { algorithm: 'fake' }};
   
   beforeEach(() => {
     res = new Res();
     req = new Req();
-    authRoutes = new Auth({ 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log });
+    pwcrypt = new Pwcrypt();
+    pwcryptError = new PwcryptError();
+    pwcryptInvalid = new PwcryptInvalid();
+    https = new HTTPS();
+    jws = new JWS();
+    authRoutes = new Auth({ 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https });
   })
 
   describe('standard authentication', () => {
@@ -53,6 +64,7 @@ describe('Auth', () => {
         password: 'tampered'
       };
       validate(req, res, { message: 'An error occurred decrypting the password.', errors: { error1: 'An error', error2: 'Another error' } }, 500, authRoutesFailures.auth);
+      expect(pwcryptError.calls.verify).toEqual(1);
     });
 
     it('should fail on incorrect password', () => {
@@ -62,6 +74,7 @@ describe('Auth', () => {
         password: 'incorrect'
       };
       validate(req, res, {"message":"Invalid password."}, 400, authRoutesFailures.auth);
+      expect(pwcryptInvalid.calls.verify).toEqual(1);
     });
 
     it('should authenticate users', () => {
@@ -70,6 +83,24 @@ describe('Auth', () => {
         password: 'password'
       };
       validate(req, res, { "message": "Authenticated successfully.", "token": "jsonwebtoken" }, 200, authRoutes.auth);
+      expect(pwcrypt.calls.verify).toEqual(1);
+      expect(jws.calls.sign).toEqual(1);
+    });
+  });
+  describe('facebook authentication', () => {
+    it('should fail without a facebook auth code', () => {
+      let error = {"param":"code","msg":"A facebook auth code is required."};
+      req.validationErrors = function() { return [error] };
+      validate(req, res, {"message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.facebook);
+      expect(https.calls.request).toEqual(0);
+      expect(jws.calls.sign).toEqual(0);
+    });
+
+    it('should authenticate successfully', () => {
+      req.body = { code: 'facebookcode' };
+      validate(req, res, { message: 'Authenticated successfully.', token: 'jsonwebtoken' }, 200, authRoutes.facebook);
+      expect(https.calls.request).toEqual(2);
+      expect(jws.calls.sign).toEqual(1);
     });
   });
 });

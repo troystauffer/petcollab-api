@@ -14,6 +14,7 @@ const bodyparser = require('body-parser');
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
 const jws = require('jws');
+const https = require('https');
 // persistance
 const db = new (require(path.join(__dirname, 'models/')))(config.database);
 const redis = require('redis');
@@ -42,7 +43,7 @@ function App() {
 
   // define routes
   require(path.join(__dirname, 'routes/user'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log });
-  require(path.join(__dirname, 'routes/auth'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log });
+  require(path.join(__dirname, 'routes/auth'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https });
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');

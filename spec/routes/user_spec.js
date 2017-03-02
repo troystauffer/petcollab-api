@@ -4,7 +4,7 @@ import Res from '../util/res';
 import Req from '../util/req';
 import db from '../util/db';
 import dbFailures from '../util/db_failures';
-import pwcrypt from '../util/pwcrypt';
+import Pwcrypt from '../util/pwcrypt';
 import UserToken from '../util/user_token';
 import log from '../util/log';
 
@@ -12,12 +12,16 @@ describe('User', () => {
   let res = {};
   let req = {};
   let userRoutes = {};
+  let pwcrypt = {};
+  let userToken = {};
   const config = { 'confirmationTokenLength': 6 };
   
   beforeEach(() => {
     res = new Res();
     req = new Req();
-    userRoutes = new User({ 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log });
+    pwcrypt = new Pwcrypt();
+    userToken = new UserToken();
+    userRoutes = new User({ 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
   })
 
   describe('misc endpoints', () => {
@@ -43,6 +47,9 @@ describe('User', () => {
       };
       req.validationErrors = function() { return [error] };
       validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      expect(req.calls.checkBody).toEqual(4);
+      expect(req.calls.notEmpty).toEqual(3);
+      expect(req.calls.isEmail).toEqual(1);
     });
 
     it('should fail without password', () => {
@@ -53,6 +60,9 @@ describe('User', () => {
       };
       req.validationErrors = function() { return [error] };
       validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      expect(req.calls.checkBody).toEqual(4);
+      expect(req.calls.notEmpty).toEqual(3);
+      expect(req.calls.isEmail).toEqual(1);
     });
 
     it('should fail without name', () => {
@@ -63,6 +73,9 @@ describe('User', () => {
       };
       req.validationErrors = function() { return [error] };
       validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      expect(req.calls.checkBody).toEqual(4);
+      expect(req.calls.notEmpty).toEqual(3);
+      expect(req.calls.isEmail).toEqual(1);
     });
 
     it('should fail without a valid email', () => {
@@ -74,6 +87,9 @@ describe('User', () => {
       };
       req.validationErrors = function() { return [error] };
       validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      expect(req.calls.checkBody).toEqual(4);
+      expect(req.calls.notEmpty).toEqual(3);
+      expect(req.calls.isEmail).toEqual(1);
     });
 
     it('should create a user', () => {
@@ -83,16 +99,27 @@ describe('User', () => {
         name: 'Test Unit'
       };
       validate(req, res, { "message": "Account created successfully." }, 201, userRoutes.create);
+      expect(pwcrypt.calls.secureHash).toEqual(1);
+      expect(req.calls.checkBody).toEqual(4);
+      expect(req.calls.notEmpty).toEqual(3);
+      expect(req.calls.isEmail).toEqual(1);
+      expect(req.calls.validationErrors).toEqual(1);
+      expect(userToken.calls.generateToken).toEqual(1);
     });
 
     it('should prevent duplicate email addresses', () => {
-      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log });
+      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
       req.body = {
         email: 'duplicate@example.com',
         password: 'password',
         name: 'Test Unit'
       };
       validate(req, res, { "message": "User with this email already exists." }, 400, userRoutesFailure.create);
+      expect(pwcrypt.calls.secureHash).toEqual(1);
+      expect(req.calls.checkBody).toEqual(4);
+      expect(req.calls.notEmpty).toEqual(3);
+      expect(req.calls.isEmail).toEqual(1);
+      expect(req.calls.validationErrors).toEqual(1);
     });
   });
 
@@ -102,6 +129,11 @@ describe('User', () => {
       req.body = { email: 'testunit@example.com' };
       req.validationErrors = function() { return [error] };
       validate(req, res, {"message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      expect(req.calls.checkBody).toEqual(2);
+      expect(req.calls.notEmpty).toEqual(2);
+      expect(req.calls.isAlphanumeric).toEqual(1);
+      expect(req.calls.isLength).toEqual(1);
+      expect(req.calls.isEmail).toEqual(1);
     });
 
     it('should fail without an email address', () => {
@@ -109,15 +141,25 @@ describe('User', () => {
       req.body = { confirmation_token: 'asdf' };
       req.validationErrors = function() { return [error] };
       validate(req, res, {"message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      expect(req.calls.checkBody).toEqual(2);
+      expect(req.calls.notEmpty).toEqual(2);
+      expect(req.calls.isAlphanumeric).toEqual(1);
+      expect(req.calls.isLength).toEqual(1);
+      expect(req.calls.isEmail).toEqual(1);
     });
 
     it('should error on invalid token', () => {
-      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log });
+      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
       req.body = {
         email: 'testunit@example.com',
         confirmation_token: 'invalid'
       };
       validate(req, res, { "message": "Email or token are invalid." }, 400, userRoutesFailure.confirm);
+      expect(req.calls.checkBody).toEqual(2);
+      expect(req.calls.notEmpty).toEqual(2);
+      expect(req.calls.isAlphanumeric).toEqual(1);
+      expect(req.calls.isLength).toEqual(1);
+      expect(req.calls.isEmail).toEqual(1);
     })
 
     it('should confirm a user', () => {
@@ -126,6 +168,12 @@ describe('User', () => {
         email: 'testunit@example.com'
       };
       validate(req, res, { message: 'Confirmation successful.' }, 200, userRoutes.confirm);
+      expect(req.calls.checkBody).toEqual(2);
+      expect(req.calls.notEmpty).toEqual(2);
+      expect(req.calls.isAlphanumeric).toEqual(1);
+      expect(req.calls.isLength).toEqual(1);
+      expect(req.calls.isEmail).toEqual(1);
+      expect(req.calls.validationErrors).toEqual(1);
     });
   });
 });
