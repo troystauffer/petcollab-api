@@ -26,15 +26,15 @@ describe('User', () => {
 
   describe('misc endpoints', () => {
     it('should return user info', () => {
-      validate(req, res, { user: { user_id: 1 }}, 200, userRoutes.info);
+      validate(req, res, { success: true, response: {user: { user_id: 1 }}}, 200, userRoutes.info);
     });
 
     it('should return a well formed error', () => {
-      validate(req, res, { message: 'An error occurred.' }, 400, userRoutes.error);
+      validate(req, res, { success: false, message: 'An error occurred.' }, 400, userRoutes.error);
     });
 
     it('should return the user fields', () => {
-      validate(req, res, userDescribe, 200, userRoutes.fields);
+      validate(req, res, { success: true, response: userDescribe}, 200, userRoutes.fields);
     });
   });
 
@@ -46,7 +46,7 @@ describe('User', () => {
         name: 'Test Unit'
       };
       req.validationErrors = function() { return [error] };
-      validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -59,7 +59,7 @@ describe('User', () => {
         name: 'Test Unit'
       };
       req.validationErrors = function() { return [error] };
-      validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -72,7 +72,7 @@ describe('User', () => {
         password: 'password'
       };
       req.validationErrors = function() { return [error] };
-      validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -86,7 +86,7 @@ describe('User', () => {
         name: 'Test Unit'
       };
       req.validationErrors = function() { return [error] };
-      validate(req, res, { "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -98,7 +98,7 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      validate(req, res, { "message": "Account created successfully." }, 201, userRoutes.create);
+      validate(req, res, { success: true, "message": "Account created successfully." }, 201, userRoutes.create);
       expect(pwcrypt.calls.secureHash).toEqual(1);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
@@ -114,7 +114,7 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      validate(req, res, { "message": "User with this email already exists." }, 400, userRoutesFailure.create);
+      validate(req, res, { success: false, "message": "User with this email already exists." }, 400, userRoutesFailure.create);
       expect(pwcrypt.calls.secureHash).toEqual(1);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
@@ -128,7 +128,7 @@ describe('User', () => {
       let error = {"param":"confirmation_token","msg":"A valid confirmation token is required."};
       req.body = { email: 'testunit@example.com' };
       req.validationErrors = function() { return [error] };
-      validate(req, res, {"message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);
@@ -140,7 +140,7 @@ describe('User', () => {
       let error = [{"param":"email","msg":"A valid email is required."},{"param":"email","msg":"A valid email is required."}];
       req.body = { confirmation_token: 'asdf' };
       req.validationErrors = function() { return [error] };
-      validate(req, res, {"message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);
@@ -154,7 +154,7 @@ describe('User', () => {
         email: 'testunit@example.com',
         confirmation_token: 'invalid'
       };
-      validate(req, res, { "message": "Email or token are invalid." }, 400, userRoutesFailure.confirm);
+      validate(req, res, { success: false, "message": "Email or token are invalid." }, 400, userRoutesFailure.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);
@@ -167,7 +167,7 @@ describe('User', () => {
         confirmation_token: 'asdf',
         email: 'testunit@example.com'
       };
-      validate(req, res, { message: 'Confirmation successful.' }, 200, userRoutes.confirm);
+      validate(req, res, { success: true, message: 'Confirmation successful.' }, 200, userRoutes.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);
