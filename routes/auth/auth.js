@@ -1,4 +1,4 @@
-import RO from '../../lib/response_object';
+const RO = require('../../lib/response_object');
 
 let _this = {};
 
