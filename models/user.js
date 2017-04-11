@@ -7,12 +7,25 @@ module.exports = function(sequelize, DataTypes) {
     password_hash: DataTypes.STRING,
     salt: DataTypes.STRING,
     confirmation_token: DataTypes.STRING,
-    confirmed: DataTypes.DATE
+    confirmed: DataTypes.DATE,
+    role_id: { 
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Roles',
+        key: 'id'
+      },
+      validate: {
+        notEmpty: true,
+        isNumeric: true
+      }
+    }
   }, {
     underscored: true,
     classMethods: {
       associate: function(models) {
-        // associations can be defined here
+        User.belongsTo(models.Role, {
+          foreignKey: 'role_id'
+        });
       }
     },
     instanceMethods: {
