@@ -3,22 +3,22 @@
 module.exports = {
   up: function (queryInterface, Sequelize) {
     queryInterface.addColumn(
-      'users',
+      'Users',
       'email', { type: Sequelize.STRING }
     );
     queryInterface.addColumn(
-      'users',
+      'Users',
       'password_hash', { type: Sequelize.STRING }
     );
     return queryInterface.addColumn(
-      'users',
+      'Users',
       'salt', { type: Sequelize.STRING }
     );
   },
 
   down: function (queryInterface, Sequelize) {
-    queryInterface.removeColumn('users', 'email');
-    queryInterface.removeColumn('users', 'password_hash');
-    return queryInterface.removeColumn('users', 'salt');
+    queryInterface.removeColumn('Users', 'email');
+    queryInterface.removeColumn('Users', 'password_hash');
+    return queryInterface.removeColumn('Users', 'salt');
   }
 };

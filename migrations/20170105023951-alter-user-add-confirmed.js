@@ -3,7 +3,7 @@
 module.exports = {
   up: function (queryInterface, Sequelize) {
     queryInterface.addColumn(
-      'users',
+      'Users',
       'confirmed',
       {
         type: Sequelize.DATE,
@@ -12,7 +12,7 @@ module.exports = {
       }
     );
     return queryInterface.addColumn(
-      'users',
+      'Users',
       'confirmation_token',
       {
         type: Sequelize.STRING,
@@ -23,7 +23,7 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.removeColumn('users', 'confirmed');
-    return queryInterface.removeColumn('users', 'confirmation_token');
+    return queryInterface.removeColumn('Users', 'confirmed');
+    return queryInterface.removeColumn('Users', 'confirmation_token');
   }
 };
