@@ -5,6 +5,10 @@ let _this = {};
 
 let User = function(args = {}) {
   Object.keys(args).map((key) => { _this[key] = args[key]; });
+  _this.db.Role.findOne({ where: { title: 'user' }})
+  .then((role) => {
+    _this.userRole = role;
+  });
 }
 
 User.prototype.create = function(req, res) {
@@ -25,6 +29,7 @@ User.prototype.create = function(req, res) {
       _this.UserToken.generateToken(_this.config.confirmationTokenLength, function(token) {
         _this.log.info('Confirmation token generated for user ' + user.email + ': ' + token);
         user.confirmation_token = token;
+        user.setRole(_this.userRole);
         user.save()
         .then(function(user) {
           if (user) {
