@@ -7,9 +7,3 @@ dependencies:
   pre:
     - npm install sqlite3 sequelize-cli
     - ./node_modules/sequelize-cli/bin/sequelize db:migrate
-deployment:
-  production:
-    branch: master
-    commands:
-      - ./bin/deploy.sh petcollab-api production:
-          timeout: 360
