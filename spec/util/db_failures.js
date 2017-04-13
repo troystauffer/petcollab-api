@@ -10,5 +10,12 @@ module.exports = {
         then: function(fn) { fn(null) }
       }
     }
+  },
+  Role: {
+    findOne: function() {
+      return {
+        then: function(fn) { fn(null) }
+      }
+    }
   }
 }

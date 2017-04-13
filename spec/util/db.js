@@ -8,6 +8,9 @@ let user = {
             callback({ id: 1 });
           }
         }
+      },
+      setRole: function() {
+        return true;
       }
     });
   },
@@ -25,6 +28,9 @@ let user = {
             }
           }
         }
+      },
+      setRole: function() {
+        return true;
       }
     }, true);
   }
@@ -86,6 +92,14 @@ let userTable = {
 let userDescribe = {
   then: function(callback) { callback(userTable) }
 }
+let role = {
+  then: function(callback) {
+    callback({
+      id: 1,
+      title: 'user'
+    });
+  }
+}
 
 module.exports = {
   User: {
@@ -100,6 +114,11 @@ module.exports = {
     },
     describe: function() {
       return userDescribe;
+    }
+  },
+  Role: {
+    findOne: function() {
+      return role;
     }
   }
 }
