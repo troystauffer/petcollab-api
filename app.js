@@ -44,7 +44,8 @@ function App() {
 
   // define routes
   require(path.join(__dirname, 'routes/user'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log, 'authorized': authorized });
-  require(path.join(__dirname, 'routes/auth'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https, 'authorized': authorized });
+  require(path.join(__dirname, 'routes/auth'))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https });
+  require(path.join(__dirname, 'routes/event'))(router, { 'db': db, 'log': log, 'authorized': authorized });
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');
