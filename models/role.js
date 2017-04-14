@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var Role = sequelize.define('Role', {
-    title: DataTypes.STRING
+    title: { type: DataTypes.STRING, allowNull: false, validate: { notNull: true, notEmpty: true, isAlphanumeric: true }}
   }, {
     underscored: true,
     classMethods: {

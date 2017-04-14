@@ -1,24 +1,14 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define('User', {
-    name: DataTypes.STRING,
-    facebook_id: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password_hash: DataTypes.STRING,
-    salt: DataTypes.STRING,
-    confirmation_token: DataTypes.STRING,
-    confirmed: DataTypes.DATE,
-    role_id: { 
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Roles',
-        key: 'id'
-      },
-      validate: {
-        notEmpty: true,
-        isNumeric: true
-      }
-    }
+    name: { type: DataTypes.STRING, allowNull: true, validate: { notEmpty: true }},
+    facebook_id: { type: DataTypes.STRING, allowNull: true },
+    email: { type: DataTypes.STRING, allowNull: false, validate: { isEmail: true, notEmpty: true }},
+    password_hash: { type: DataTypes.STRING, allowNull: true },
+    salt: { type: DataTypes.STRING, allowNull: true },
+    confirmation_token: { type: DataTypes.STRING, allowNull: true },
+    confirmed: { type: DataTypes.DATE, allowNull: true },
+    role_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Roles', key: 'id' }, validate: { notEmpty: true, isNumeric: true }}
   }, {
     underscored: true,
     classMethods: {
@@ -30,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     instanceMethods: {
       isConfirmed: function(done) {
-        return done(confirmed != nil);
+        return done(confirmed != null);
       }
     }
   });
