@@ -78,6 +78,35 @@ let schedule = {
     });
   }
 };
+let scheduleItem = {
+  then: function(callback) {
+    callback({
+      id: 1,
+      title: 'Test Schedule Item',
+      assigned_user_id: 1,
+      schedule_id: 1,
+      starts_at: '2017-04-15T12:00:00.000Z',
+      ends_at: '2017-04-16T12:00:00.000Z',
+      order: 1,
+      update: function() {
+        return {
+          then: function(callback) {
+            callback({
+              id: 1,
+              title: 'Test Schedule Item',
+              assigned_user_id: 1,
+              schedule_id: 1,
+              starts_at: '2017-04-15T12:00:00.000Z',
+              ends_at: '2017-04-16T12:00:00.000Z',
+              order: 1
+            });
+          }
+        }
+      },
+      destroy: function() { return true; }
+    });
+  }
+}
 let userTable = {
   "id": {
     "type": "INTEGER",
@@ -164,5 +193,11 @@ module.exports = {
     findById: function() { return schedule; },
     update: function() { return schedule; },
     findAll: function() { return [schedule]; }
+  },
+  ScheduleItem: {
+    create: function() { return scheduleItem; },
+    findById: function() { return scheduleItem; },
+    update: function() { return scheduleItem; },
+    findAll: function() { return [scheduleItem]; }
   }
 }

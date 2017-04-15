@@ -36,5 +36,17 @@ module.exports = {
         then: function(fn) { fn(null) }
       }
     }
+  },
+  ScheduleItem: {
+    findAll: function() {
+      return {
+        then: function(fn) { fn([]) }
+      }
+    },
+    findById: function() {
+      return {
+        then: function(fn) { fn(null) }
+      }
+    }
   }
 }

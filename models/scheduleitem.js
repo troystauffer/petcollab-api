@@ -2,10 +2,10 @@
 module.exports = function(sequelize, DataTypes) {
   var ScheduleItem = sequelize.define('ScheduleItem', {
     title: { type: DataTypes.STRING, allowNull: true, validate: { notEmpty: true }},
-    schdeule_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Schedules', key: 'id' }, validate: { notEmpty: true, isNumeric: true }},
+    schedule_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Schedules', key: 'id' }, validate: { notEmpty: true, isNumeric: true }},
     assigned_user_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Users', key: 'id' }, validate: { notEmpty: true, isNumeric: true }},
-    starts_at: DataTypes.DATE,
-    ends_at: DataTypes.DATE,
+    starts_at: { type: DataTypes.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
+    ends_at: { type: DataTypes.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
     order: DataTypes.INTEGER
   }, {
     underscored: true,
