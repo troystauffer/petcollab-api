@@ -41,7 +41,19 @@ let event = {
       id: 1,
       title: 'Test Event',
       starts_at: '2017-04-15 12:00:00 GMT',
-      ends_at: '2017-04-16 12:00:00 GMT'
+      ends_at: '2017-04-16 12:00:00 GMT',
+      update: function() {
+        return {
+          then: function(callback) {
+            callback({
+              id: 1,
+              title: 'Test Event',
+              starts_at: '2017-04-15 12:00:00 GMT',
+              ends_at: '2017-04-16 12:00:00 GMT',
+            });
+          }
+        }
+      }
     });
   }
 };
@@ -113,30 +125,17 @@ let role = {
 
 module.exports = {
   User: {
-    findOne: function() {
-      return user;
-    },
-    create: function() {
-      return user;
-    },
-    findOrCreate: function() {
-      return user;
-    },
-    describe: function() {
-      return userDescribe;
-    }
+    findOne: function() { return user; },
+    create: function() { return user; },
+    findOrCreate: function() { return user; },
+    describe: function() { return userDescribe; }
   },
   Role: {
-    findOne: function() {
-      return role;
-    }
+    findOne: function() { return role; }
   },
   Event: {
-    create: function() {
-      return event;
-    },
-    findById: function() {
-      return event;
-    }
+    create: function() { return event; },
+    findById: function() { return event; },
+    update: function() { return event; }
   }
 }

@@ -22,7 +22,7 @@ describe('Event', () => {
     eventRoutes = new Event({ 'db': db, 'log': log });
   })
 
-  describe('event listing', () => {
+  describe('listing', () => {
     let events = [
       { 'title': 'Test Event 1', 'starts_at': '2017-04-15 12:00:00 GMT', 'ends_at': '2017-04-16 01:00:00 GMT' },
       { 'title': 'Test Event 2', 'starts_at': '2017-04-17 15:00:00 GMT', 'ends_at': '2017-04-17 16:00:00 GMT' }
@@ -34,9 +34,9 @@ describe('Event', () => {
     });
   });
 
-  describe('event creation', () => {
+  describe('creation', () => {
     it('should fail without an event title', () => {
-      let error = [{ "param": "email", "msg": "Title is required." }];
+      let error = [{ "param": "title", "msg": "Title is required." }];
       req.body = {
         start_at: '2017-04-15 12:00:00 GMT',
         ends_at: '2017-04-16 12:00:00 GMT'
@@ -96,16 +96,15 @@ describe('Event', () => {
         ends_at: '2017-04-16 12:00:00 GMT'
       };
       req.body = event;
-      validate(req, res, { success: true, message: 'Event created successfully.', response: {event} }, 201, eventRoutes.create);
+      validate(req, res, { success: true, message: 'Event created successfully.', response: { id: event.id} }, 201, eventRoutes.create);
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(3);
     });
   });
 
-  describe('event details', () => {
+  describe('details', () => {
     it('should fail without an id', () => {
-      let error = [{ "param": "email", "msg": "An event id is required." }];
-      req.params = { id: 1 };
+      let error = [{ "param": "id", "msg": "An event id is required." }];
       req.validationErrors = function() { return [error] };
       validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.event);
       expect(req.calls.checkParams).toEqual(1);
@@ -122,7 +121,7 @@ describe('Event', () => {
     });
     it('should display the details of an event', () => {
       req.params = { id: 1 };
-      validate(req, res, { success: true, response: { event: { id: 1, title: 'Test Event', starts_at: '2017-04-15 12:00:00 GMT', ends_at: '2017-04-16 12:00:00 GMT' }}}, 200, eventRoutes.event);
+      validate(req, res, { success: true, response: { id: 1, title: 'Test Event', starts_at: '2017-04-15 12:00:00 GMT', ends_at: '2017-04-16 12:00:00 GMT' }}, 200, eventRoutes.event);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -130,19 +129,66 @@ describe('Event', () => {
   });
 
   describe('event editing', () => {
-    xit('should prevent unauthorized access', () => {
+    it('should fail with an invalid id', () => {
+      let error = [{ "param": "id", "msg": "An event id is required." }];
+      req.params = { id: 'asdf' };
+      req.validationErrors = function() { return [error] };
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.update);
+      expect(req.calls.checkParams).toEqual(1);
+      expect(req.calls.checkBody).toEqual(3);
+      expect(req.calls.notEmpty).toEqual(4);
+      expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should fail without an id', () => {
+    it('should fail without an event title', () => {
+      let error = [{ "param": "title", "msg": "Title is required." }];
+      req.body = {
+        start_at: '2017-04-15 12:00:00 GMT',
+        ends_at: '2017-04-16 12:00:00 GMT'
+      };
+      req.validationErrors = function() { return [error] };
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.update);
+      expect(req.calls.checkParams).toEqual(1);
+      expect(req.calls.checkBody).toEqual(3);
+      expect(req.calls.notEmpty).toEqual(4);
+      expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should fail with an invalid id', () => {
+    it('should fail with invalid start date', () => {
+      req.body = {
+        title: 'Test Event',
+        starts_at: null,
+        ends_at: '2017-04-17 12:00:00 GMT'
+      };
+      validate(req, res, { success: false, message: 'Invalid start date.' }, 400, eventRoutes.update);
+      expect(req.calls.checkParams).toEqual(1);
+      expect(req.calls.checkBody).toEqual(3);
+      expect(req.calls.notEmpty).toEqual(4);
+      expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should fail without an event title', () => {
+    it('should fail with invalid end date', () => {
+      req.body = {
+        title: 'Test Event',
+        starts_at: '2017-04-17 12:00:00 GMT',
+        ends_at: null
+      };
+      validate(req, res, { success: false, message: 'Invalid end date.' }, 400, eventRoutes.update);
+      expect(req.calls.checkParams).toEqual(1);
+      expect(req.calls.checkBody).toEqual(3);
+      expect(req.calls.notEmpty).toEqual(4);
+      expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should fail with invalid start date', () => {
-    });
-    xit('should fail with invalid end date', () => {
-    });
-    xit('should update an event', () => {
+    it('should update an event', () => {
+      let event = {
+        title: 'Test Event',
+        starts_at: '2017-04-15 12:00:00 GMT',
+        ends_at: '2017-04-16 12:00:00 GMT'
+      };
+      req.body = event;
+      req.params = { id: 1 };
+      validate(req, res, { success: true, message: 'Event updated successfully.' }, 201, eventRoutes.update);
+      expect(req.calls.checkParams).toEqual(1);
+      expect(req.calls.checkBody).toEqual(3);
+      expect(req.calls.notEmpty).toEqual(4);
+      expect(req.calls.isNumeric).toEqual(1);
     });
   });
 });
