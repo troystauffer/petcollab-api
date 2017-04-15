@@ -11,7 +11,7 @@ class Event {
     _this.db.Event.findAll({ order: [['starts_at', 'DESC']] })
     .then((events) => {
       return res.status(200).json(new RO({ success: true, response: { events }}).obj());
-    })
+    });
   }
 
   event(req, res) {

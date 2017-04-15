@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "babel-node spec/run.js",
-    "start": "node index.js"
+    "start": "babel-node index.js"
   },
   "repository": {
     "type": "git",
