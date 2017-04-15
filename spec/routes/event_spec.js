@@ -1,4 +1,3 @@
-import path from 'path';
 import Event from '../../routes/event/event';
 import Res from '../util/res';
 import Req from '../util/req';
@@ -23,11 +22,11 @@ describe('Event', () => {
   })
 
   describe('listing', () => {
-    let events = [
-      { 'title': 'Test Event 1', 'starts_at': '2017-04-15 12:00:00 GMT', 'ends_at': '2017-04-16 01:00:00 GMT' },
-      { 'title': 'Test Event 2', 'starts_at': '2017-04-17 15:00:00 GMT', 'ends_at': '2017-04-17 16:00:00 GMT' }
-    ];
     it('should return a list of events', () => {
+      let events = [
+        { 'title': 'Test Event 1', 'starts_at': '2017-04-15 12:00:00 GMT', 'ends_at': '2017-04-16 01:00:00 GMT' },
+        { 'title': 'Test Event 2', 'starts_at': '2017-04-17 15:00:00 GMT', 'ends_at': '2017-04-17 16:00:00 GMT' }
+      ];
       sequelize.Event.bulkCreate(events).then((events) => {
         validate(req, res, { success: true, response: { events }}, 200, eventRoutes.events);
       });
@@ -128,7 +127,7 @@ describe('Event', () => {
     });
   });
 
-  describe('event editing', () => {
+  describe('editing', () => {
     it('should fail with an invalid id', () => {
       let error = [{ "param": "id", "msg": "An event id is required." }];
       req.params = { id: 'asdf' };

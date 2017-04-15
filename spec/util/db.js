@@ -57,6 +57,27 @@ let event = {
     });
   }
 };
+let schedule = {
+  then: function(callback) {
+    callback({
+      id: 1,
+      title: 'Test Schedule',
+      event_id: 1,
+      update: function() {
+        return {
+          then: function(callback) {
+            callback({
+              id: 1,
+              title: 'Test Schedule',
+              event_id: 1
+            });
+          }
+        }
+      },
+      destroy: function() { return true; }
+    });
+  }
+};
 let userTable = {
   "id": {
     "type": "INTEGER",
@@ -137,5 +158,11 @@ module.exports = {
     create: function() { return event; },
     findById: function() { return event; },
     update: function() { return event; }
+  },
+  Schedule: {
+    create: function() { return schedule; },
+    findById: function() { return schedule; },
+    update: function() { return schedule; },
+    findAll: function() { return [schedule]; }
   }
 }
