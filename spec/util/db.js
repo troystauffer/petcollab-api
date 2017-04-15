@@ -35,6 +35,16 @@ let user = {
     }, true);
   }
 };
+let event = {
+  then: function(callback) {
+    callback({
+      id: 1,
+      title: 'Test Event',
+      starts_at: '2017-04-15 12:00:00 GMT',
+      ends_at: '2017-04-16 12:00:00 GMT'
+    });
+  }
+};
 let userTable = {
   "id": {
     "type": "INTEGER",
@@ -119,6 +129,14 @@ module.exports = {
   Role: {
     findOne: function() {
       return role;
+    }
+  },
+  Event: {
+    create: function() {
+      return event;
+    },
+    findById: function() {
+      return event;
     }
   }
 }
