@@ -17,5 +17,12 @@ module.exports = {
         then: function(fn) { fn(null) }
       }
     }
+  },
+  Event: {
+    findById: function() {
+      return {
+        then: function(fn) { fn(null) }
+      }
+    }
   }
 }

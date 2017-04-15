@@ -16,6 +16,9 @@ module.exports = function(sequelize, DataTypes) {
         User.belongsTo(models.Role, {
           foreignKey: 'role_id'
         });
+        User.hasMany(models.ScheduleItem, {
+          foreignKey: 'assigned_user_id'
+        });
       }
     },
     instanceMethods: {

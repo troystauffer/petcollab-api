@@ -12,6 +12,7 @@ class Req extends Stats{
     this.calls.isEmail = 0;
     this.calls.isAlphanumeric = 0;
     this.calls.validationErrors = 0;
+    this.calls.sanitizeBody = 0;
     this.user = { user_id: 1 };
   }
   checkBody() {
@@ -49,6 +50,10 @@ class Req extends Stats{
   validationErrors() {
     this.calls.validationErrors++;
     return null;
+  }
+  sanitizeBody() {
+    this.calls.sanitizeBody++;
+    return { toDate: function() { return null; }};
   }
 }
 
