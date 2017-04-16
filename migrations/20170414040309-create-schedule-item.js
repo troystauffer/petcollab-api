@@ -11,7 +11,7 @@ module.exports = {
       title: {
         type: Sequelize.STRING
       },
-      schdeule_id: {
+      schedule_id: {
         type: Sequelize.INTEGER
       },
       assigned_user_id: {
