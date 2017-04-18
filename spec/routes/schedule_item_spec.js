@@ -4,13 +4,8 @@ import Req from '../util/req';
 import db from '../util/db';
 import dbFailures from '../util/db_failures';
 import log from '../util/log';
-import Sequelize from '../../models/';
-import Config from '../../config/';
 
-const config = new Config();
-const sequelize = new Sequelize(config.database);
-
-describe('Schedule', () => {
+describe('Schedule item', () => {
   let res = {};
   let req = {};
   let scheduleItemRoutes = {};
@@ -31,16 +26,20 @@ describe('Schedule', () => {
       expect(req.calls.isNumeric).toEqual(1);
     });
     it('should return a list of schedule items', () => {
-      let items = [
-        { 'title': 'Test Schedule Item 1' },
-        { 'title': 'Test Schedule Item 2' }
-      ];
-      sequelize.ScheduleItem.bulkCreate(items).then((items) => {
-        validate(req, res, { success: true, response: { items }}, 200, scheduleItemRoutes.list);
-        expect(req.calls.checkParams).toEqual(1);
-        expect(req.calls.notEmpty).toEqual(1);
-        expect(req.calls.isNumeric).toEqual(1);
-      });
+      req.params = { schedule_id: 1 }
+      let items = [{
+        id: 1,
+        title: 'Test Schedule Item',
+        assigned_user_id: 1,
+        schedule_id: 1,
+        starts_at: '2017-04-15T12:00:00.000Z',
+        ends_at: '2017-04-16T12:00:00.000Z',
+        order: 1
+      }];
+      validate(req, res, { success: true, response: { schedule_items: items }}, 200, scheduleItemRoutes.list);
+      expect(req.calls.checkParams).toEqual(1);
+      expect(req.calls.notEmpty).toEqual(1);
+      expect(req.calls.isNumeric).toEqual(1);
     });
   });
 

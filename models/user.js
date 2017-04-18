@@ -19,6 +19,9 @@ module.exports = function(sequelize, DataTypes) {
         User.hasMany(models.ScheduleItem, {
           foreignKey: 'assigned_user_id'
         });
+        User.hasMany(models.Event, {
+          foreignKey: 'owner_user_id'
+        });
       }
     },
     instanceMethods: {

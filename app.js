@@ -29,7 +29,6 @@ const log = (require('bunyan')).createLogger(config.log);
 const morgan = require('morgan');
 // custom middleware
 const authenticated = require(path.join(__dirname, 'lib/authenticated'))(jws, config.jws);
-const authorized = require(path.join(__dirname, 'lib/authorized'))(db);
 
 function App() {
   EventEmitter.call(this);
@@ -43,11 +42,11 @@ function App() {
   router.use(authenticated.unless({ path: unsecuredRoutes }));
 
   // define routes
-  new (require(path.join(__dirname, 'routes/user')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log, 'authorized': authorized });
+  new (require(path.join(__dirname, 'routes/user')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log });
   new (require(path.join(__dirname, 'routes/auth')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https });
-  new (require(path.join(__dirname, 'routes/event')))(router, { 'db': db, 'log': log, 'authorized': authorized });
-  new (require(path.join(__dirname, 'routes/schedule')))(router, { 'db': db, 'log': log, 'authorized': authorized });
-  new (require(path.join(__dirname, 'routes/schedule_item')))(router, { 'db': db, 'log': log, 'authorized': authorized });
+  new (require(path.join(__dirname, 'routes/event')))(router, { 'db': db, 'log': log });
+  new (require(path.join(__dirname, 'routes/schedule')))(router, { 'db': db, 'log': log });
+  new (require(path.join(__dirname, 'routes/schedule_item')))(router, { 'db': db, 'log': log });
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');

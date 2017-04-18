@@ -53,7 +53,10 @@ class Req extends Stats{
   }
   sanitizeBody() {
     this.calls.sanitizeBody++;
-    return { toDate: function() { return null; }};
+    return { 
+      toDate: function() { return null; },
+      toInt: function() { return null; }
+    };
   }
 }
 
