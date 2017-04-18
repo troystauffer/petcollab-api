@@ -69,6 +69,15 @@ class Event {
   }
 
   delete(req, res) {
+    req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
+    let errors = req.validationErrors();
+    if (errors) return res.status(400).json(new RO({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+    _this.db.Event.findById(req.params.event_id)
+    .then((event) => {
+      if (!event) return res.status(404).json(new RO({ success: false, message: 'No event found for provided id.'}).obj());
+      event.destroy();
+      return res.status(200).json(new RO({ success: true, message: 'Event deleted.' }).obj());
+    });
   }
 }
 
