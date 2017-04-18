@@ -4,11 +4,6 @@ import Req from '../util/req';
 import db from '../util/db';
 import dbFailures from '../util/db_failures';
 import log from '../util/log';
-import Sequelize from '../../models/';
-import Config from '../../config/';
-
-const config = new Config();
-const sequelize = new Sequelize(config.database);
 
 describe('Event', () => {
   let res = {};
@@ -24,12 +19,9 @@ describe('Event', () => {
   describe('listing', () => {
     it('should return a list of events', () => {
       let events = [
-        { 'title': 'Test Event 1', 'starts_at': '2017-04-15 12:00:00 GMT', 'ends_at': '2017-04-16 01:00:00 GMT' },
-        { 'title': 'Test Event 2', 'starts_at': '2017-04-17 15:00:00 GMT', 'ends_at': '2017-04-17 16:00:00 GMT' }
+        { id: 1, 'title': 'Test Event', 'starts_at': '2017-04-15 12:00:00 GMT', 'ends_at': '2017-04-16 12:00:00 GMT', owner_user_id: 1 }
       ];
-      sequelize.Event.bulkCreate(events).then((events) => {
-        validate(req, res, { success: true, response: { events }}, 200, eventRoutes.events);
-      });
+      validate(req, res, { success: true, response: { events }}, 200, eventRoutes.events);
     });
   });
 
@@ -120,7 +112,8 @@ describe('Event', () => {
     });
     it('should display the details of an event', () => {
       req.params = { id: 1 };
-      validate(req, res, { success: true, response: { id: 1, title: 'Test Event', starts_at: '2017-04-15 12:00:00 GMT', ends_at: '2017-04-16 12:00:00 GMT' }}, 200, eventRoutes.event);
+      req.user = { user_id: 1 };
+      validate(req, res, { success: true, response: { id: 1, owner_user_id: 1, title: 'Test Event', starts_at: '2017-04-15 12:00:00 GMT', ends_at: '2017-04-16 12:00:00 GMT' }}, 200, eventRoutes.event);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

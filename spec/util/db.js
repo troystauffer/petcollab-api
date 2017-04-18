@@ -42,6 +42,7 @@ let event = {
       title: 'Test Event',
       starts_at: '2017-04-15 12:00:00 GMT',
       ends_at: '2017-04-16 12:00:00 GMT',
+      owner_user_id: 1,
       update: function() {
         return {
           then: function(callback) {
@@ -50,6 +51,7 @@ let event = {
               title: 'Test Event',
               starts_at: '2017-04-15 12:00:00 GMT',
               ends_at: '2017-04-16 12:00:00 GMT',
+              owner_user_id: 1
             });
           }
         }
@@ -57,6 +59,17 @@ let event = {
     });
   }
 };
+let events = {
+  then: function(callback) {
+    callback([{
+      id:1,
+      title: 'Test Event',
+      starts_at: '2017-04-15 12:00:00 GMT',
+      ends_at: '2017-04-16 12:00:00 GMT',
+      owner_user_id: 1
+    }])
+  }
+}
 let schedule = {
   then: function(callback) {
     callback({
@@ -76,6 +89,15 @@ let schedule = {
       },
       destroy: function() { return true; }
     });
+  }
+};
+let schedules = {
+  then: function(callback) {
+    callback([{
+      id: 1,
+      title: 'Test Schedule',
+      event_id: 1
+    }]);
   }
 };
 let scheduleItem = {
@@ -105,6 +127,19 @@ let scheduleItem = {
       },
       destroy: function() { return true; }
     });
+  }
+}
+let scheduleItems = {
+  then: function(callback) {
+    callback([{
+      id: 1,
+      title: 'Test Schedule Item',
+      assigned_user_id: 1,
+      schedule_id: 1,
+      starts_at: '2017-04-15T12:00:00.000Z',
+      ends_at: '2017-04-16T12:00:00.000Z',
+      order: 1
+    }]);
   }
 }
 let userTable = {
@@ -186,18 +221,19 @@ module.exports = {
   Event: {
     create: function() { return event; },
     findById: function() { return event; },
-    update: function() { return event; }
+    update: function() { return event; },
+    findAll: function() { return events; }
   },
   Schedule: {
     create: function() { return schedule; },
     findById: function() { return schedule; },
     update: function() { return schedule; },
-    findAll: function() { return [schedule]; }
+    findAll: function() { return schedules; }
   },
   ScheduleItem: {
     create: function() { return scheduleItem; },
     findById: function() { return scheduleItem; },
     update: function() { return scheduleItem; },
-    findAll: function() { return [scheduleItem]; }
+    findAll: function() { return scheduleItems; }
   }
 }
