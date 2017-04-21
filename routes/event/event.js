@@ -90,17 +90,21 @@ class Event extends BaseRoute{
     return function(req, res, next) {
       hasRole(req.user, roles, function(result) {
         if (result) {
-          if (req.params.event_id) {
-            _this.db.Event.findOne({ where: { id: req.params.event_id, owner_user_id: req.user.user_id }})
-            .then((event) => {
-              if (!event) {
-                return res.status(404).json(new RO({ success: false, message: 'User is not authorized to view or modify the specified event.'}).obj());
-              } else {
-                return next();
-              }
-            });
+          if (roles.includes('super_admin')) {
+            next();
           } else {
-            return next();
+            if (req.params.event_id) {
+              _this.db.Event.findOne({ where: { id: req.params.event_id, owner_user_id: req.user.user_id }})
+              .then((event) => {
+                if (!event) {
+                  return res.status(404).json(new RO({ success: false, message: 'User is not authorized to view or modify the specified event.'}).obj());
+                } else {
+                  return next();
+                }
+              });
+            } else {
+              return next();
+            }
           }
         } else {
           return res.status(403).json(new RO({ success: false, message: 'User not authorized.' }).obj());
