@@ -8,6 +8,7 @@ class BaseRoute {
   isAuthorized() { return function(req, res, next) { next(); }}
 
   hasRole(user, roles, cb) {
+    if (roles.includes('any')) { return cb(true); }
     if (user && user.user_id) {
       _this.db.User.findById(user.user_id)
       .then((user) => {
