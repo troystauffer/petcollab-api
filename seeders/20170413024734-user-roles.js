@@ -12,6 +12,11 @@ module.exports = {
         title: 'admin',
         created_at: new Date(),
         updated_at: new Date()
+      },
+      {
+        title: 'super_admin',
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ], {});
   },

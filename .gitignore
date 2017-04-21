@@ -2,3 +2,4 @@ node_modules
 petcollab-db.development.sqlite
 petcollab-db.test.sqlite
 npm-debug.log
+seeders/20170421210827-super-admin.js
