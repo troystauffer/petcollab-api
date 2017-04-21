@@ -1,10 +1,12 @@
+import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import _ from 'lodash';
 
 let _this = {};
 
-class User {
+class User extends BaseRoute {
   constructor(args = {}) {
+    super(args);
     Object.keys(args).map((key) => { _this[key] = args[key]; });
     _this.db.Role.findOne({ where: { title: 'user' }})
     .then((role) => {
@@ -12,36 +14,12 @@ class User {
     });
   }
 
-  create(req, res) {
-    req.checkBody('email', 'Email is required.').notEmpty();
-    req.checkBody('email', 'Email must be a valid email address.').isEmail();
-    req.checkBody('password', 'A valid password is required.').notEmpty();
-    req.checkBody('name', 'A valid name is required.').notEmpty();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
-    _this.pwcrypt.secureHash(req.body.password, function( err, passwordHash, salt ) {
-      if (err) return res.status(500).json(new RO({success: false, message: 'An error occurred.', errors: err }).obj());
-      _this.db.User.findOrCreate({ where: { email: req.body.email }})
-      .spread(function(user, created) {
-        if (!created) return res.status(400).json(new RO({success: false, message: 'User with this email already exists.'}).obj());
-        user.password_hash = passwordHash;
-        user.salt = salt;
-        user.name = req.body.name;
-        _this.UserToken.generateToken(_this.config.confirmationTokenLength, function(token) {
-          _this.log.info('Confirmation token generated for user ' + user.email + ': ' + token);
-          user.confirmation_token = token;
-          user.setRole(_this.userRole);
-          user.save()
-          .then(function(user) {
-            if (user) {
-              return res.status(201).json(new RO({success: true, message: 'Account created successfully.' }).obj());
-            } else {
-              return res.status(500).json(new RO({success: false, message: 'An error occurred creating the account.', errors: err }).obj());
-            }
-          });
-        });
-      });
-    });
+  createAdmin(req, res) {
+    return create(req, res, _this.adminRole);
+  }
+
+  createUser(req, res) {
+    return create(req, res, _this.userRole);
   }
 
   info(req, res) {
@@ -83,6 +61,51 @@ class User {
       }
     })
   }
+
+  isAuthorized(roles) {
+    let hasRole = super.hasRole;
+    return function(req, res, next) {
+      hasRole(req.user, roles, function(result) {
+        if (result) {
+          next();
+        } else {
+          return res.status(403).json(new RO({ success: false, message: 'User not authorized.' }).obj());
+        }
+      });
+    }
+  }
+}
+
+function create(req, res, role) {
+  req.checkBody('email', 'Email is required.').notEmpty();
+  req.checkBody('email', 'Email must be a valid email address.').isEmail();
+  req.checkBody('password', 'A valid password is required.').notEmpty();
+  req.checkBody('name', 'A valid name is required.').notEmpty();
+  let errors = req.validationErrors();
+  if (errors) return res.status(400).json(new RO({success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+  _this.pwcrypt.secureHash(req.body.password, function( err, passwordHash, salt ) {
+    if (err) return res.status(500).json(new RO({success: false, message: 'An error occurred.', errors: err }).obj());
+    _this.db.User.findOrCreate({ where: { email: req.body.email }})
+    .spread(function(user, created) {
+      if (!created) return res.status(400).json(new RO({success: false, message: 'User with this email already exists.'}).obj());
+      user.password_hash = passwordHash;
+      user.salt = salt;
+      user.name = req.body.name;
+      _this.UserToken.generateToken(_this.config.confirmationTokenLength, function(token) {
+        _this.log.info('Confirmation token generated for user ' + user.email + ': ' + token);
+        user.confirmation_token = token;
+        user.setRole(role);
+        user.save()
+        .then(function(user) {
+          if (user) {
+            return res.status(201).json(new RO({success: true, message: 'Account created successfully.' }).obj());
+          } else {
+            return res.status(500).json(new RO({success: false, message: 'An error occurred creating the account.', errors: err }).obj());
+          }
+        });
+      });
+    });
+  });
 }
 
 module.exports = User;

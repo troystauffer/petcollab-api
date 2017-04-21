@@ -1,5 +1,6 @@
 import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
+import _ from 'lodash';
 
 let _this = {};
 
@@ -90,7 +91,7 @@ class Event extends BaseRoute{
     return function(req, res, next) {
       hasRole(req.user, roles, function(result) {
         if (result) {
-          if (roles.includes('super_admin')) {
+          if (_.intersection(roles, ['super_admin', 'any']).length) {
             next();
           } else {
             if (req.params.event_id) {
