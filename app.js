@@ -9,6 +9,9 @@ const validator = require('express-validator');
 // configuration
 const config = new (require(path.join(__dirname, 'config/')));
 const unsecuredRoutes = require(path.join(__dirname, 'config/unsecured_routes'))(config.apiPrefix);
+// logging
+const log = (require('bunyan')).createLogger(config.log);
+const morgan = require('morgan');
 // utils
 const bodyparser = require('body-parser');
 const EventEmitter = require('events').EventEmitter;
@@ -16,7 +19,7 @@ const util = require('util');
 const jws = require('jws');
 const https = require('https');
 // persistance
-const db = new (require(path.join(__dirname, 'models/')))(config.database);
+const db = new (require(path.join(__dirname, 'models/')))(config.database, log);
 const redis = require('redis');
 const expressSession = require('express-session');
 const RedisStore = require('connect-redis')(expressSession);
@@ -24,11 +27,8 @@ const RedisStore = require('connect-redis')(expressSession);
 const EasyPbkdf2 = require('easy-pbkdf2');
 const pwcrypt = EasyPbkdf2(config.easyPbkdf2);
 const UserToken = new (require(path.join(__dirname, 'lib/user_token')))(db);
-// logging
-const log = (require('bunyan')).createLogger(config.log);
-const morgan = require('morgan');
 // custom middleware
-const authenticated = require(path.join(__dirname, 'lib/authenticated'))(jws, config.jws);
+const authenticated = require(path.join(__dirname, 'lib/authenticated'))(jws, config.jws, log);
 
 function App() {
   EventEmitter.call(this);

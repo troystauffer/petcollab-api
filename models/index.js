@@ -9,12 +9,14 @@ let config = {};
 let sequelize = {};
 let db = {};
 
-function DB(_config) {
+function DB(_config, log) {
   config = _config;
   if (config.use_env_variable) {
     sequelize = new Sequelize(process.env[config.use_env_variable]);
+    log.info('Initialized database from ENV variable.');
   } else {
     sequelize = new Sequelize(config.database, config.username, config.password, config);
+    log.info('Initialized database from config.');
   }
 
   fs
@@ -26,6 +28,7 @@ function DB(_config) {
     if (file.slice(-3) !== '.js') return;
     let model = sequelize['import'](path.join(__dirname, file));
     db[model.name] = model;
+    log.info('Initialized model ' + model.name);
   });
 
   Object.keys(db).forEach(function(modelName) {
