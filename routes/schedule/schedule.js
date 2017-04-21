@@ -1,5 +1,7 @@
 import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
+import ApiError from '../../lib/api_error';
+import _ from 'lodash';
 
 let _this = {};
 
@@ -9,39 +11,36 @@ class Schedule extends BaseRoute {
     Object.keys(args).map((key) => { _this[key] = args[key]; });
   }
 
-  schedules(req, res) {
+  list(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Schedule.findAll({ where: { event_id: req.params.event_id }})
     .then((schedules) => {
-      return res.status(200).json(new RO({ success: true, response: { schedules }}).obj());
+      return res.status(200).json(new RO({ success: true, response: { schedules }}));
     });
   }
 
-  schedule(req, res) {
+  detail(req, res) {
     req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Schedule.findById(req.params.schedule_id)
     .then((schedule) => {
-      if (!schedule) return res.status(404).json(new RO({ success: false, message: 'No schedule found for provided id.'}).obj());
-      return res.status(200).json(new RO({ success: true, response: { id: schedule.id, event_id: schedule.event_id, title: schedule.title }}).obj());
+      if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.detail.not_found', message: 'No schedule found for provided id.'})]}));
+      return res.status(200).json(new RO({ success: true, response: { id: schedule.id, event_id: schedule.event_id, title: schedule.title }}));
     });
   }
 
   create(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     req.checkBody('title', 'Title is required.').notEmpty();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Event.findById(req.params.event_id).then((event) => {
-      if (!event) return res.status(404).json(new RO({ success: false, message: 'Invalid event id.' }).obj());
+      if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.create.not_found', message: 'No event found for provided id.'})]}));
       _this.db.Schedule.create({
         event_id: event.id,
         title: req.body.title
       }).then((schedule) => {
-        return res.status(201).json(new RO({ success: true, message: 'Schedule created successfully.', response: { id: schedule.id }}).obj());
+        return res.status(201).json(new RO({ success: true, message: 'Schedule created successfully.', response: { id: schedule.id }}));
       });
     });
   }
@@ -49,28 +48,26 @@ class Schedule extends BaseRoute {
   update(req, res) {
     req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
     req.checkBody('title', 'Title is required.').notEmpty();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Schedule.findById(req.params.schedule_id)
     .then((schedule) => {
-      if (!schedule) return res.status(404).json(new RO({ success: false, message: 'No schedule found for provided id.'}).obj());
+      if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.update.not_found', message: 'No schedule found for provided id.'})]}));
       schedule.update({
         title: req.body.title,
       }).then((schedule) => {
-        return res.status(201).json(new RO({ success: true, message: 'Schedule updated successfully.' }).obj());
+        return res.status(201).json(new RO({ success: true, message: 'Schedule updated successfully.' }));
       });
     });
   }
 
   delete(req, res) {
     req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Schedule.findById(req.params.schedule_id)
     .then((schedule) => {
-      if (!schedule) return res.status(404).json(new RO({ success: false, message: 'No schedule found for provided id.'}).obj());
+      if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.delete.not_found', message: 'No schedule found for provided id.'})]}));
       schedule.destroy();
-      return res.status(200).json(new RO({ success: true, message: 'Schedule deleted.' }).obj());
+      return res.status(200).json(new RO({ success: true, message: 'Schedule deleted.' }));
     });
   }
 
@@ -79,31 +76,35 @@ class Schedule extends BaseRoute {
     return function(req, res, next) {
       hasRole(req.user, roles, function(result) {
         if (result) {
-          if (req.params.event_id) {
-            _this.db.Event.findOne({ where: { id: req.params.event_id, owner_user_id: req.user.user_id }}).then((event) => {
-              if (!event) {
-                return res.status(404).json(new RO({ success: false, message: 'User is not authorized to view or modify the specified event.'}).obj());
-              } else {
-                return next();
-              }
-            });
+          if (_.intersection(roles, ['super_admin', 'any']).length) {
+            next();
           } else {
-            _this.db.Schedule.findOne({ where: { id: req.params.schedule_id }, include: [{ model: _this.db.Event, where:{ owner_user_id: req.user.user_id }}]}).then((schedule) => {
-              if (schedule) {
-                schedule.getEvent().then((event) => {
-                  if (event && event.owner_user_id == req.user.user_id) {
-                    next();
-                  } else {
-                    return res.status(404).json(new RO({ success: false, message: 'User is not authorized to view or modify the specified event.'}).obj());
-                  }
-                })
-              } else {
-                return res.status(404).json(new RO({ success: false, message: 'User is not authorized to view or modify the specified event.'}).obj());
-              }
-            })
+            if (req.params.event_id) {
+              _this.db.Event.findOne({ where: { id: req.params.event_id, owner_user_id: req.user.user_id }}).then((event) => {
+                if (!event) {
+                  return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified event.'})]}));
+                } else {
+                  return next();
+                }
+              });
+            } else {
+              _this.db.Schedule.findOne({ where: { id: req.params.schedule_id }, include: [{ model: _this.db.Event, where:{ owner_user_id: req.user.user_id }}]}).then((schedule) => {
+                if (schedule) {
+                  schedule.getEvent().then((event) => {
+                    if (event && event.owner_user_id == req.user.user_id) {
+                      next();
+                    } else {
+                      return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule.'})]}));
+                    }
+                  })
+                } else {
+                  return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule.'})]}));
+                }
+              })
+            }
           }
         } else {
-          return res.status(403).json(new RO({ success: false, message: 'User not authorized.' }).obj());
+          return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized.'})]}));
         }
       });
     }

@@ -1,44 +1,45 @@
+import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
+import ApiError from '../../lib/api_error';
 
 let _this = {};
 
-class Auth {
+class Auth extends BaseRoute {
   constructor(args = {}) {
+    super(args);
     Object.keys(args).map((key) => { _this[key] = args[key]; });
   }
 
-  auth(req, res) {
+  authenticate(req, res) {
     req.checkBody('email', 'Email is required.').notEmpty();
     req.checkBody('email', 'Email must be a valid email address.').isEmail();
     req.checkBody('password', 'A valid password is required.').notEmpty();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors}).obj());
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.User.findOne({ where: { email: req.body.email }})
     .then(function(user) {
-      if (!user) return res.status(400).json(new RO({success: false, message: 'No such user.'}).obj());
+      if (!user) return res.status(400).json(new RO({success: false, errors: [new ApiError({ type: 'auth.authenticate.user.not_found', message: 'No such user.' })]}));
         try {
           _this.pwcrypt.verify( user.salt, user.password_hash, req.body.password, function( err, valid ) {
-            if (err) return res.status(500).json(new RO({ success: false, message: 'An error occurred decrypting the password.', errors: err }).obj());
-            if (!valid) return res.status(400).json(new RO({ success: false, message: 'Invalid password.' }).obj());
+            if (err) return res.status(500).json(new RO({ success: false, errors: [new ApiError({ type: 'auth.authenticate.password.invalid', message: 'An error occurred decrypting the password.', validations: err })]}));
+            if (!valid) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'auth.authenticate.password.invalid', message: 'Invalid password.' })]}));
             let token = generateToken({ user_id: user.id, email: user.email, name: user.name });
-            return res.status(200).json(new RO({ success:true, message: 'Authenticated successfully.', response: {token: token}}).obj());
+            return res.status(200).json(new RO({ success:true, message: 'Authenticated successfully.', response: {token: token}}));
           });
         } catch(err) {
-          return res.status(500).json(new RO({success: false, errors: err}).obj());
+          return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'auth.authenticate.unspecified', message: 'An error occurred. See errors for details.', validations: err })]}));
         }
       });
   }
 
   facebook(req, res) {
     req.checkBody('code', 'A facebook auth code is required.').notEmpty();
-    let errors = req.validationErrors();
-    if (errors) return res.status(400).json(new RO({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors }).obj());
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     httpsRequest({
       host: _this.config.facebook.ogurl,
       path: '/v2.8/oauth/access_token?client_id=' + _this.config.facebook.clientID + '&client_secret=' + _this.config.facebook.clientSecret + '&code=' + req.body.code + '&redirect_uri=' + _this.config.facebook.redirectUri
     }, function(validation) {
-      if (validation.error && validation.error.code == 190) return res.status(403).json(new RO({ success: false, message: 'Invalid facebook code.' }).obj());
-      if (validation.error || !validation.access_token) return res.status(500).json(new RO({ success: false, message: 'An error occurred validating the facebook code.' }).obj());
+      if (validation.error && validation.error.code == 190) return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'auth.facebook.code.invalid', message: 'Invalid facebook code.' })]}));
+      if (validation.error || !validation.access_token) return res.status(500).json(new RO({ success: false, errors: [new ApiError({ type: 'auth.facebook.code.invalid', message: 'An error occurred validating the facebook code.' })]}));
       httpsRequest({
         host: _this.config.facebook.ogurl,
         path: '/me?access_token=' + validation.access_token
@@ -51,11 +52,11 @@ class Auth {
             user.save()
             .then(function() {
               let token = generateToken({ user_id: user.id, facebook_access_token: validation.access_token });
-              return res.status(200).json(new RO({ success: true, message: 'Authenticated successfully.', response: {token: token} }).obj());
+              return res.status(200).json(new RO({ success: true, message: 'Authenticated successfully.', response: {token: token} }));
             });
           } else {
             let token = generateToken({ user_id: user.id, facebook_access_token: validation.access_token });
-            return res.status(200).json(new RO({ success: true, message: 'Authenticated successfully.', response: {token: token} }).obj());
+            return res.status(200).json(new RO({ success: true, message: 'Authenticated successfully.', response: {token: token} }));
           }
         });
       });

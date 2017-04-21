@@ -34,17 +34,19 @@ describe('Auth', () => {
 
   describe('standard authentication', () => {
     it('should fail without email', () => {
-      let error = [{"param":"email","msg":"Email is required."},{"param":"email","msg":"Email must be a valid email address."}];
       req.body = { password: 'password' };
-      req.validationErrors = function() { return [error] };
-      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.auth);
+      let validationErrors = [{ param: 'email', msg: 'Email is required.' }, { param: 'email', msg: 'Email must be a valid email address.' }];
+      let error = { type: 'api.params.invalid', validation: validationErrors };
+      req.validationErrors = function() { return validationErrors };
+      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.authenticate);
     });
 
     it('should fail without password', () => {
-      let error = {"param":"password","msg":"A valid password is required."};
       req.body = { email: 'testunit@example.com' };
-      req.validationErrors = function() { return [error] };
-      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.auth);
+      let validationErrors = [{"param":"password","msg":"A valid password is required."}];
+      let error = { type: 'api.params.invalid', validation: validationErrors };
+      req.validationErrors = function() { return validationErrors };
+      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.authenticate);
     });
 
     it('should fail on invalid email', () => {
@@ -53,7 +55,7 @@ describe('Auth', () => {
         email: 'invalid@example.com',
         password: 'password'
       };
-      validate(req, res, { success: false, message: 'No such user.' }, 400, authRoutesFailures.auth);
+      validate(req, res, {"success":false,"errors":[{"type":"auth.authenticate.user.not_found","message":"No such user."}]}, 400, authRoutesFailures.authenticate);
     });
 
     it('should fail on tampered password hash', () => {
@@ -62,7 +64,7 @@ describe('Auth', () => {
         email: 'testunit@example.com',
         password: 'tampered'
       };
-      validate(req, res, { success: false, message: 'An error occurred decrypting the password.', errors: { error1: 'An error', error2: 'Another error' } }, 500, authRoutesFailures.auth);
+      validate(req, res, { success: false, errors: [{ type: 'auth.authenticate.password.invalid', message: 'An error occurred decrypting the password.' }]}, 500, authRoutesFailures.authenticate);
       expect(pwcryptError.calls.verify).toEqual(1);
     });
 
@@ -72,7 +74,7 @@ describe('Auth', () => {
         email: 'testunit@example.com',
         password: 'incorrect'
       };
-      validate(req, res, {success: false, "message":"Invalid password."}, 400, authRoutesFailures.auth);
+      validate(req, res, {"success":false,"errors":[{"type":"auth.authenticate.password.invalid","message":"Invalid password."}]}, 400, authRoutesFailures.authenticate);
       expect(pwcryptInvalid.calls.verify).toEqual(1);
     });
 
@@ -81,15 +83,16 @@ describe('Auth', () => {
         email: 'testunit@example.com',
         password: 'password'
       };
-      validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "jsonwebtoken"} }, 200, authRoutes.auth);
+      validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "jsonwebtoken"} }, 200, authRoutes.authenticate);
       expect(pwcrypt.calls.verify).toEqual(1);
       expect(jws.calls.sign).toEqual(1);
     });
   });
   describe('facebook authentication', () => {
     it('should fail without a facebook auth code', () => {
-      let error = {"param":"code","msg":"A facebook auth code is required."};
-      req.validationErrors = function() { return [error] };
+      let validationErrors = [{"param":"code","msg":"A facebook auth code is required."}];
+      let error = { type: 'api.params.invalid', validation: validationErrors };
+      req.validationErrors = function() { return validationErrors };
       validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.facebook);
       expect(https.calls.request).toEqual(0);
       expect(jws.calls.sign).toEqual(0);

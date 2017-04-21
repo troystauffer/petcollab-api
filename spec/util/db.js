@@ -55,7 +55,8 @@ let event = {
             });
           }
         }
-      }
+      },
+      destroy: function() {}
     });
   }
 };
