@@ -15,6 +15,7 @@ class Event extends BaseRoute{
   list(req, res) {
     _this.db.Event.findAll({ order: [['starts_at', 'DESC']] })
     .then((events) => {
+      _this.log.info('Listing all events for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, response: { events }}));
     });
   }
@@ -25,6 +26,7 @@ class Event extends BaseRoute{
     _this.db.Event.findById(req.params.event_id)
     .then((event) => {
       if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.detail.not_found', message: 'No event found for provided id.' })]}));
+      _this.log.info('Detailing event ' + req.params.event_id + ' for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, response: { id: event.id, owner_user_id: event.owner_user_id, title: event.title, starts_at: event.starts_at, ends_at: event.ends_at }}));
     });
   }
@@ -46,6 +48,7 @@ class Event extends BaseRoute{
       ends_at: req.body.ends_at,
       owner_user_id: req.body.owner_user_id
     }).then((event) => {
+      _this.log.info('Created new event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
       return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: { id: event.id }}));
     })
   }
@@ -68,6 +71,7 @@ class Event extends BaseRoute{
         starts_at: req.body.starts_at,
         ends_at: req.body.ends_at
       }).then((event) => {
+        _this.log.info('Updated event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
         return res.status(201).json(new RO({ success: true, message: 'Event updated successfully.' }));
       });
     });
@@ -80,6 +84,7 @@ class Event extends BaseRoute{
     .then((event) => {
       if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.delete.not_found', message: 'No event found for provided id.' })]}));
       event.destroy();
+      _this.log.info('Deleted event ' + req.params.event_id + ' for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, message: 'Event deleted.' }));
     });
   }
@@ -95,16 +100,20 @@ class Event extends BaseRoute{
               _this.db.Event.findOne({ where: { id: req.params.event_id, owner_user_id: req.user.user_id }})
               .then((event) => {
                 if (!event) {
+                  _this.log.info('Access denied for user ' + req.user.user_id);
                   return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'event.user.not_authorized', message: 'User is not authorized to view or modify the specified event.'})]}));
                 } else {
+                  _this.log.info('Access granted for user ' + req.user.user_id);
                   return next();
                 }
               });
             } else {
+              _this.log.info('Access granted for user ' + req.user.user_id);
               return next();
             }
           }
         } else {
+          _this.log.info('Access denied for user ' + req.user.user_id);
           return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'event.user.not_authorized', message: 'User is not authorized to view or modify the specified event.'})]}));
         }
       })

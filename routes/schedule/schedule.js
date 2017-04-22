@@ -16,6 +16,7 @@ class Schedule extends BaseRoute {
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Schedule.findAll({ where: { event_id: req.params.event_id }})
     .then((schedules) => {
+      _this.log.info('Listing schedules for event ' + req.params.event_id + ' for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, response: { schedules }}));
     });
   }
@@ -26,6 +27,7 @@ class Schedule extends BaseRoute {
     _this.db.Schedule.findById(req.params.schedule_id)
     .then((schedule) => {
       if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.detail.not_found', message: 'No schedule found for provided id.'})]}));
+      _this.log.info('Detailing schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, response: { id: schedule.id, event_id: schedule.event_id, title: schedule.title }}));
     });
   }
@@ -40,6 +42,7 @@ class Schedule extends BaseRoute {
         event_id: event.id,
         title: req.body.title
       }).then((schedule) => {
+        _this.log.info('Created schedule for event ' + req.params.event_id + ' for user ' + req.user.email);
         return res.status(201).json(new RO({ success: true, message: 'Schedule created successfully.', response: { id: schedule.id }}));
       });
     });
@@ -55,6 +58,7 @@ class Schedule extends BaseRoute {
       schedule.update({
         title: req.body.title,
       }).then((schedule) => {
+        _this.log.info('Updated schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
         return res.status(201).json(new RO({ success: true, message: 'Schedule updated successfully.' }));
       });
     });
@@ -67,6 +71,7 @@ class Schedule extends BaseRoute {
     .then((schedule) => {
       if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.delete.not_found', message: 'No schedule found for provided id.'})]}));
       schedule.destroy();
+      _this.log.info('Deleted schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, message: 'Schedule deleted.' }));
     });
   }
@@ -77,13 +82,16 @@ class Schedule extends BaseRoute {
       hasRole(req.user, roles, function(result) {
         if (result) {
           if (_.intersection(roles, ['super_admin', 'any']).length) {
+            _this.log.info('Access granted for user ' + req.user.email);
             next();
           } else {
             if (req.params.event_id) {
               _this.db.Event.findOne({ where: { id: req.params.event_id, owner_user_id: req.user.user_id }}).then((event) => {
                 if (!event) {
+                  _this.log.info('Access denied for user ' + req.user.email);
                   return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified event.'})]}));
                 } else {
+                  _this.log.info('Access granted for user ' + req.user.email);
                   return next();
                 }
               });
@@ -92,18 +100,22 @@ class Schedule extends BaseRoute {
                 if (schedule) {
                   schedule.getEvent().then((event) => {
                     if (event && event.owner_user_id == req.user.user_id) {
+                      _this.log.info('Access granted for user ' + req.user.email);
                       next();
                     } else {
+                      _this.log.info('Access granted for user ' + req.user.email);
                       return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule.'})]}));
                     }
                   })
                 } else {
+                  _this.log.info('Access granted for user ' + req.user.email);
                   return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule.'})]}));
                 }
               })
             }
           }
         } else {
+          _this.log.info('Access granted for user ' + req.user.email);
           return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized.'})]}));
         }
       });
