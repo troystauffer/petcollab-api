@@ -10,6 +10,15 @@ module.exports = function(sequelize, DataTypes) {
         Transfer.belongsTo(models.Pet, { foreignKey: 'pet_id' });
         Transfer.belongsTo(models.Event, { foreignKey: 'event_id' });
       }
+    },
+    instanceMethods: {
+      toJSON: function() {
+        return {
+          id: this.id,
+          pet_id: this.pet_id,
+          event_id: this.event_id
+        };
+      }
     }
   });
   return Transfer;

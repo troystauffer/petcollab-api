@@ -11,12 +11,21 @@ module.exports = function(sequelize, DataTypes) {
     underscored: true,
     classMethods: {
       associate: function(models) {
-        ScheduleItem.belongsTo(models.Schedule, {
-          foreignKey: 'schedule_id'
-        });
-        ScheduleItem.belongsTo(models.User, {
-          foreignKey: 'assigned_user_id'
-        });
+        ScheduleItem.belongsTo(models.Schedule, { foreignKey: 'schedule_id' });
+        ScheduleItem.belongsTo(models.User, { foreignKey: 'assigned_user_id' });
+      }
+    },
+    instanceMethods: {
+      toJSON: function() {
+        return {
+          id: this.id,
+          title: this.title,
+          schedule_id: this.schedule_id,
+          assigned_user_id: this.assigned_user_id,
+          starts_at: this.starts_at,
+          ends_at: this.ends_at,
+          order: this.order
+        };
       }
     }
   });

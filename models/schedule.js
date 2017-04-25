@@ -7,12 +7,17 @@ module.exports = function(sequelize, DataTypes) {
     underscored: true,
     classMethods: {
       associate: function(models) {
-        Schedule.belongsTo(models.Event, {
-          foreignKey: 'event_id'
-        });
-        Schedule.hasMany(models.ScheduleItem, {
-          foreignKey: 'schedule_id'
-        });
+        Schedule.belongsTo(models.Event, { foreignKey: 'event_id' });
+        Schedule.hasMany(models.ScheduleItem, { foreignKey: 'schedule_id' });
+      }
+    },
+    instanceMethods: {
+      toJSON: function() {
+        return {
+          id: this.id,
+          title: this.title,
+          event_id: this.event_id
+        };
       }
     }
   });

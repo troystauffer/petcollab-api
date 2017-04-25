@@ -8,6 +8,14 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         PetType.hasMany(models.Pet, { foreignKey: 'pet_type_id' });
       }
+    },
+    instanceMethods: {
+      toJSON: function() {
+        return {
+          id: this.id,
+          title: this.title
+        };
+      }
     }
   });
   return PetType;

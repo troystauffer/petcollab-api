@@ -25,7 +25,7 @@ class User extends BaseRoute {
   }
 
   info(req, res) {
-    return res.status(200).json(new RO({success: true, response: {user: req.user}}));
+    return res.status(200).json(new RO({success: true, response: req.user}));
   }
 
   error(req, res) {

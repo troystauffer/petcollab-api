@@ -48,6 +48,7 @@ function App() {
   new (require(path.join(__dirname, 'routes/schedule')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/schedule_item')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/pet')))(router, { 'db': db, 'log': log });
+  new (require(path.join(__dirname, 'routes/rescue')))(router, { 'db': db, 'log': log });
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');

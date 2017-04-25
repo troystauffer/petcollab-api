@@ -11,6 +11,16 @@ module.exports = function(sequelize, DataTypes) {
         Pet.belongsTo(models.PetType, { foreignKey: 'pet_type_id' });
         Pet.hasMany(models.Transfer, { foreignKey: 'pet_id' });
       }
+    },
+    instanceMethods: {
+      toJSON: function() {
+        return {
+          id: this.id,
+          name: this.name,
+          pet_type_id: this.pet_type_id,
+          comments: this.comments
+        };
+      }
     }
   });
   return Pet;

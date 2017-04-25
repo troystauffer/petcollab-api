@@ -6,9 +6,15 @@ module.exports = function(sequelize, DataTypes) {
     underscored: true,
     classMethods: {
       associate: function(models) {
-        Role.hasMany(models.User, {
-          foreignKey: 'role_id'
-        });
+        Role.hasMany(models.User, { foreignKey: 'role_id' });
+      }
+    },
+    instanceMethods: {
+      toJSON: function() {
+        return {
+          id: this.id,
+          title: this.title
+        };
       }
     }
   });

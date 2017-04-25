@@ -23,11 +23,14 @@ class Event extends BaseRoute{
   detail(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Event.findById(req.params.event_id)
+    _this.db.Event.findById(req.params.event_id, { include: [{ model: _this.db.Rescue, as:'ReleasingRescue' }, { model: _this.db.Rescue, as:'ReceivingRescue' }]})
     .then((event) => {
       if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.detail.not_found', message: 'No event found for provided id.' })]}));
+      let releasingRescue, receivingRescue = {};
+      if (event.ReleasingRescue) releasingRescue = event.ReleasingRescue;
+      if (event.ReceivingRescue) receivingRescue = event.ReceivingRescue;
       _this.log.info('Detailing event ' + req.params.event_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { id: event.id, owner_user_id: event.owner_user_id, title: event.title, starts_at: event.starts_at, ends_at: event.ends_at }}));
+      return res.status(200).json(new RO({ success: true, response: { id: event.id, owner_user_id: event.owner_user_id, title: event.title, starts_at: event.starts_at, ends_at: event.ends_at, releasing_rescue: releasingRescue, receiving_rescue: receivingRescue }}));
     });
   }
 
@@ -39,6 +42,8 @@ class Event extends BaseRoute{
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
     req.sanitizeBody('owner_user_id').toInt();
+    req.sanitizeBody('releasing_rescue_id').toInt();
+    req.sanitizeBody('receiving_rescue_id').toInt();
     if (!req.body.starts_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.create.starts_at.invalid', message: 'Invalid start date.' })]}));
     if (!req.body.ends_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.create.ends_at.invalid', message: 'Invalid end date.' })]}));
     if (!req.body.owner_user_id) req.body.owner_user_id = req.user.user_id;
@@ -46,10 +51,12 @@ class Event extends BaseRoute{
       title: req.body.title,
       starts_at: req.body.starts_at,
       ends_at: req.body.ends_at,
-      owner_user_id: req.body.owner_user_id
+      owner_user_id: req.body.owner_user_id,
+      releasing_rescue_id: req.body.releasing_rescue_id,
+      receiving_rescue_id: req.body.receiving_rescue_id
     }).then((event) => {
       _this.log.info('Created new event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
-      return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: { id: event.id }}));
+      return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: event}));
     })
   }
 
@@ -61,15 +68,21 @@ class Event extends BaseRoute{
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
+    req.sanitizeBody('releasing_rescue_id').toInt();
+    req.sanitizeBody('receiving_rescue_id').toInt();
     if (!req.body.starts_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.update.starts_at.invalid', message: 'Invalid start date.' })]}));
     if (!req.body.ends_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.update.ends_at.invalid', message: 'Invalid end date.' })]}));
     _this.db.Event.findById(req.params.event_id)
     .then((event) => {
       if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.update.not_found', message: 'No event found for provided id.' })]}));
+      if (!req.body.releasing_rescue_id) req.body.releasing_rescue_id = event.releasing_rescue_id;
+      if (!req.body.receiving_rescue_id) req.body.receiving_rescue_id = event.receiving_rescue_id;
       event.update({
         title: req.body.title,
         starts_at: req.body.starts_at,
-        ends_at: req.body.ends_at
+        ends_at: req.body.ends_at,
+        releasing_rescue_id: req.body.releasing_rescue_id,
+        receiving_rescue_id: req.body.receiving_rescue_id
       }).then((event) => {
         _this.log.info('Updated event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
         return res.status(201).json(new RO({ success: true, message: 'Event updated successfully.' }));

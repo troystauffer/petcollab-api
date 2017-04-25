@@ -13,20 +13,23 @@ module.exports = function(sequelize, DataTypes) {
     underscored: true,
     classMethods: {
       associate: function(models) {
-        User.belongsTo(models.Role, {
-          foreignKey: 'role_id'
-        });
-        User.hasMany(models.ScheduleItem, {
-          foreignKey: 'assigned_user_id'
-        });
-        User.hasMany(models.Event, {
-          foreignKey: 'owner_user_id'
-        });
+        User.belongsTo(models.Role, { foreignKey: 'role_id' });
+        User.hasMany(models.ScheduleItem, {_foreignKey: 'assigned_user_id' });
+        User.hasMany(models.Event, { foreignKey: 'owner_user_id' });
       }
     },
     instanceMethods: {
       isConfirmed: function(done) {
         return done(confirmed != null);
+      },
+      toJSON: () => {
+        return {
+          id: this.id,
+          name: this.name,
+          email: this.email,
+          confirmed: this.confirmed,
+          role_id: this.role_id
+        }
       }
     }
   });
