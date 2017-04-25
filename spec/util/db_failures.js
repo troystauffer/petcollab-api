@@ -1,3 +1,11 @@
+let petTypes = {
+  then: function(callback) {
+    callback([{
+      id: 1,
+      title: 'Dog'
+    }]);
+  }
+};
 module.exports = {
   User: {
     findOrCreate: function() {
@@ -48,5 +56,20 @@ module.exports = {
         then: function(fn) { fn(null) }
       }
     }
+  },
+  Pet: {
+    findAll: function() {
+      return {
+        then: function(fn) { fn([]) }
+      }
+    },
+    findById: function() {
+      return {
+        then: function(fn) { fn(null) }
+      }
+    }
+  },
+  PetType: {
+    findAll: function() { return petTypes; }
   }
 }

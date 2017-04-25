@@ -208,6 +208,76 @@ let role = {
     });
   }
 }
+let pet = {
+  then: function(callback) {
+    callback({
+      id: 1,
+      name: 'Test Pet',
+      pet_type_id: 1,
+      comments: 'Good dog.',
+      PetType: {
+        id: 1,
+        title: 'Dog'
+      },
+      update: function() {
+        return {
+          then: function(callback) {
+            callback({
+              id: 1,
+              name: 'Test Pet',
+              pet_type_id: 1,
+              PetType: {
+                id: 1,
+                title: 'Dog'
+              },
+              comments: 'Good dog.'
+            });
+          }
+        }
+      },
+      destroy: function() { return true; }
+    });
+  }
+}
+let pets = {
+  then: function(callback) {
+    callback([{
+      id: 1,
+      name: 'Test Pet',
+      pet_type_id: 1,
+      comments: 'Good dog.',
+      PetType: {
+        id: 1,
+        title: 'Dog'
+      },
+      update: function() {
+        return {
+          then: function(callback) {
+            callback({
+              id: 1,
+              name: 'Test Pet',
+              pet_type_id: 1,
+              comments: 'Good dog.',
+              PetType: {
+                id: 1,
+                title: 'Dog'
+              }
+            });
+          }
+        }
+      },
+      destroy: function() { return true; }
+    }]);
+  }
+}
+let petTypes = {
+  then: function(callback) {
+    callback([{
+      id: 1,
+      title: 'Dog'
+    }]);
+  }
+};
 
 module.exports = {
   User: {
@@ -236,5 +306,14 @@ module.exports = {
     findById: function() { return scheduleItem; },
     update: function() { return scheduleItem; },
     findAll: function() { return scheduleItems; }
+  },
+  Pet: {
+    create: function() { return pet; },
+    findById: function() { return pet; },
+    update: function() { return pet; },
+    findAll: function() { return pets; }
+  },
+  PetType: {
+    findAll: function() { return petTypes; }
   }
 }
