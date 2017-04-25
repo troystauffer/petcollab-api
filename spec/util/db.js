@@ -208,6 +208,20 @@ let role = {
     });
   }
 }
+let transferData = {
+  id: 1,
+  pet_id: 1,
+  event_id: 1,
+  destroy: function() { return true; }
+};
+let transfer = {
+  then: function(callback) {
+    callback(transferData);
+    return { then: function(callback) {
+      callback();
+    }}
+  }
+};
 let pet = {
   then: function(callback) {
     callback({
@@ -219,6 +233,7 @@ let pet = {
         id: 1,
         title: 'Dog'
       },
+      Transfers: [transferData],
       update: function() {
         return {
           then: function(callback) {
@@ -230,6 +245,7 @@ let pet = {
                 id: 1,
                 title: 'Dog'
               },
+              Transfers: [transferData],
               comments: 'Good dog.'
             });
           }
@@ -250,6 +266,7 @@ let pets = {
         id: 1,
         title: 'Dog'
       },
+      Transfers: [transferData],
       update: function() {
         return {
           then: function(callback) {
@@ -258,6 +275,7 @@ let pets = {
               name: 'Test Pet',
               pet_type_id: 1,
               comments: 'Good dog.',
+              Transfers: [transferData],
               PetType: {
                 id: 1,
                 title: 'Dog'
@@ -315,5 +333,9 @@ module.exports = {
   },
   PetType: {
     findAll: function() { return petTypes; }
-  }
+  },
+  Transfer: {
+    create: function() { return transfer; },
+    findOne: function() { return transfer; }
+  } 
 }

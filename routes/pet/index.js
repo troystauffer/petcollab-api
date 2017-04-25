@@ -6,6 +6,7 @@ class PetRoutes {
     router.get('/pets/:pet_id', pet.detail);
     router.post('/pets/:pet_id', pet.isAuthorized(['admin', 'super_admin']), pet.update);
     router.delete('/pets/:pet_id', pet.isAuthorized(['admin', 'super_admin']), pet.delete);
+    router.post('/pets/:pet_id/transfer/:event_id', pet.isAuthorized(['admin', 'super_admin']), pet.transfer);
   }
 }
 

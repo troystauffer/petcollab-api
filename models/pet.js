@@ -9,6 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Pet.belongsTo(models.PetType, { foreignKey: 'pet_type_id' });
+        Pet.hasMany(models.Transfer, { foreignKey: 'pet_id' });
       }
     }
   });

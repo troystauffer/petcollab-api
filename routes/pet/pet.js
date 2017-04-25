@@ -15,15 +15,17 @@ class Pet extends BaseRoute{
   }
 
   list(req, res) {
-    _this.db.Pet.findAll({ include: [ _this.db.PetType ], order: [['created_at', 'DESC']] })
+    _this.db.Pet.findAll({ include: [ _this.db.PetType, _this.db.Transfer ], order: [['created_at', 'DESC']] })
     .then((pets) => {
       _this.log.info('Listing all pets for user ' + req.user.email);
       let response = [];
       pets.forEach((pet) => {
-        let petType = '';
-        if (pet.PetType) petType = pet.PetType.title;
-        response.push({ id: pet.id, name: pet.name, pet_type_id: pet.pet_type_id, pet_type: petType, comments: pet.comments })
-      })
+        let transfers = [];
+        pet.Transfers.forEach((transfer) => {
+          transfers.push({ id: transfer.id, pet_id: transfer.pet_id, event_id: transfer.event_id });
+        });
+        response.push({ id: pet.id, name: pet.name, pet_type_id: pet.pet_type_id, pet_type: pet.PetType.title, comments: pet.comments, transfers: transfers })
+      });
       return res.status(200).json(new RO({ success: true, response: response }));
     });
   }
@@ -48,12 +50,16 @@ class Pet extends BaseRoute{
   detail(req, res) {
     req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Pet.findById(req.params.pet_id, { include: [ _this.db.PetType ]}).then((pet) => {
+    _this.db.Pet.findById(req.params.pet_id, { include: [ _this.db.PetType, _this.db.Transfer ]}).then((pet) => {
       if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.detail.not_found', message: 'No pet found for provided id.' })]}));
-      _this.log.info('Detailing pet ' + req.params.pet_id + ' for user ' + req.user.email);
       let petType = '';
       if (pet.PetType) petType = pet.PetType.title;
-      return res.status(200).json(new RO({ success: true, response: { id: pet.id, name: pet.name, pet_type_id: pet.pet_type_id, pet_type: petType, comments: pet.comments }}));
+      let transfers = [];
+      pet.Transfers.forEach((transfer) => {
+        transfers.push({ id: transfer.id, pet_id: transfer.pet_id, event_id: transfer.event_id });
+      });
+      _this.log.info('Detailing pet ' + req.params.pet_id + ' for user ' + req.user.email);
+      return res.status(200).json(new RO({ success: true, response: { id: pet.id, name: pet.name, pet_type_id: pet.pet_type_id, pet_type: petType, comments: pet.comments, transfers: transfers }}));
     })
   }
 
@@ -88,6 +94,28 @@ class Pet extends BaseRoute{
       pet.destroy();
       _this.log.info('Deleted pet ' + req.params.pet_id + ' for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, message: 'Pet deleted.' }));
+    });
+  }
+
+  transfer(req, res) {
+    req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
+    req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    _this.db.Pet.findById(req.params.pet_id).then((pet) => {
+      if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.transfer.not_found', message: 'No pet found for provided id.' })]}));
+      _this.db.Event.findById(req.params.event_id).then((event) => {
+        if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.transfer.not_found', message: 'No event found for provided id.' })]}));
+        _this.db.Transfer.findOne({ where: { pet_id: req.params.pet_id }}).then((transfer) => {
+          if (transfer) return transfer.destroy();
+        }).then(() => {
+          _this.db.Transfer.create({
+            pet_id: req.params.pet_id,
+            event_id: req.params.event_id
+          }).then((transfer) => {
+            return res.status(201).json(new RO({ success: true, message: 'Transfer created.' }));
+          })
+        });
+      });
     });
   }
 }
