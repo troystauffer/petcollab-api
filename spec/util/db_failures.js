@@ -33,6 +33,13 @@ module.exports = {
       }
     }
   },
+  Rescue: {
+    findById: function() {
+      return {
+        then: function(fn) { fn(null) }
+      }
+    }
+  },
   Schedule: {
     findAll: function() {
       return {

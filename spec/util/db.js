@@ -71,6 +71,24 @@ let events = {
     }])
   }
 }
+let rescueData = {
+  id: 1,
+  name: 'Test Rescue',
+  street_address: '123 Test St',
+  city: 'Testsville',
+  state: 'TN',
+  zip_code: '12345'
+}
+let rescue = {
+  then: function(callback) {
+    callback(rescueData);
+  }
+};
+let rescues = {
+  then: function(callback) {
+    callback([rescueData])
+  }
+}
 let schedule = {
   then: function(callback) {
     callback({
@@ -312,6 +330,12 @@ module.exports = {
     findById: function() { return event; },
     update: function() { return event; },
     findAll: function() { return events; }
+  },
+  Rescue: {
+    create: function() { return rescue; },
+    findById: function() { return rescue; },
+    update: function() { return rescue; },
+    findAll: function() { return rescues; }
   },
   Schedule: {
     create: function() { return schedule; },
