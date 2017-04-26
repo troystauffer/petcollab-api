@@ -80,11 +80,12 @@ class Auth extends BaseRoute {
 }
 
 function generateToken(data) {
-  return _this.jws.sign({
+  let token = _this.jws.sign({
     header: { alg: _this.config.jws.algorithm },
     payload: data,
     secret: _this.config.jws.key
   });
+  return _this.encryption.encrypt(token);
 }
 
 function httpsRequest(options, cb) {

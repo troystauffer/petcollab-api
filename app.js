@@ -27,8 +27,9 @@ const RedisStore = require('connect-redis')(expressSession);
 const EasyPbkdf2 = require('easy-pbkdf2');
 const pwcrypt = EasyPbkdf2(config.easyPbkdf2);
 const UserToken = new (require(path.join(__dirname, 'lib/user_token')))(db);
+const encryption = new (require(path.join(__dirname, 'lib/encryption')))({ config: config.encryption });
 // custom middleware
-const authenticated = require(path.join(__dirname, 'lib/authenticated'))(jws, config.jws, log);
+const authenticated = require(path.join(__dirname, 'lib/authenticated'))(jws, config.jws, encryption, log);
 
 function App() {
   EventEmitter.call(this);
@@ -43,7 +44,7 @@ function App() {
 
   // define routes
   new (require(path.join(__dirname, 'routes/user')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log });
-  new (require(path.join(__dirname, 'routes/auth')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https });
+  new (require(path.join(__dirname, 'routes/auth')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'encryption': encryption, 'log': log, 'https': https });
   new (require(path.join(__dirname, 'routes/event')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/schedule')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/schedule_item')))(router, { 'db': db, 'log': log });

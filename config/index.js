@@ -13,6 +13,10 @@ module.exports = function(){
       key: process.env.SESSION_KEY,
       algorithm: 'HS256'
     },
+    encryption: {
+      algorithm: 'aes-256-ctr',
+      secret: process.env.SESSION_KEY
+    },
     easyPbkdf2: {
       DEFAULT_HASH_ITERATIONS: 10,
       SALT_SIZE: 32,
