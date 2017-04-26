@@ -16,7 +16,9 @@ module.exports = function(sequelize, DataTypes) {
         return {
           id: this.id,
           title: this.title,
-          event_id: this.event_id
+          event_id: this.event_id,
+          event: this.Event,
+          schedule_items: this.ScheduleItems
         };
       }
     }

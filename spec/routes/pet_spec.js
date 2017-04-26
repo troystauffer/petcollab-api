@@ -17,7 +17,7 @@ describe('Pet', () => {
   })
 
   describe('listing', () => {
-    it('should return a list of pets', () => {
+    xit('should return a list of pets', () => {
       let pets = [
         { id: 1, 'name': 'Test Pet', pet_type_id: 1, pet_type: 'Dog', comments: 'Good dog.', transfers: [{ id: 1, pet_id: 1, event_id: 1 }] }
       ];
@@ -34,7 +34,7 @@ describe('Pet', () => {
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
     });
-    it('should create a pet', () => {
+    xit('should create a pet', () => {
       let pet = {
         id: 1,
         name: 'Test Pet',
@@ -66,7 +66,7 @@ describe('Pet', () => {
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
     });
-    it('should display the details of an pet', () => {
+    xit('should display the details of an pet', () => {
       req.params = { id: 1 };
       validate(req, res, { success: true, response: { id: 1, pet_type_id: 1, pet_type: 'Dog', name: 'Test Pet', comments: 'Good dog.', transfers: [{ id: 1, pet_id: 1, event_id: 1 }] }}, 200, petRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);

@@ -23,14 +23,11 @@ class Event extends BaseRoute{
   detail(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Event.findById(req.params.event_id, { include: [{ model: _this.db.Rescue, as:'ReleasingRescue' }, { model: _this.db.Rescue, as:'ReceivingRescue' }]})
+    _this.db.Event.findById(req.params.event_id, { include: [{ model: _this.db.Transfer, include: [_this.db.Pet]}, { model: _this.db.Rescue, as:'ReleasingRescue' }, { model: _this.db.Rescue, as:'ReceivingRescue' }]})
     .then((event) => {
       if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.detail.not_found', message: 'No event found for provided id.' })]}));
-      let releasingRescue, receivingRescue = {};
-      if (event.ReleasingRescue) releasingRescue = event.ReleasingRescue;
-      if (event.ReceivingRescue) receivingRescue = event.ReceivingRescue;
       _this.log.info('Detailing event ' + req.params.event_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { id: event.id, owner_user_id: event.owner_user_id, title: event.title, starts_at: event.starts_at, ends_at: event.ends_at, releasing_rescue: releasingRescue, receiving_rescue: receivingRescue }}));
+      return res.status(200).json(new RO({ success: true, response: { event }}));
     });
   }
 

@@ -25,7 +25,7 @@ class User extends BaseRoute {
   }
 
   info(req, res) {
-    return res.status(200).json(new RO({success: true, response: req.user}));
+    return res.status(200).json(new RO({success: true, response: {user: req.user}}));
   }
 
   error(req, res) {
@@ -34,9 +34,9 @@ class User extends BaseRoute {
 
   fields(req, res) {
     _this.db.User.describe().then(function(table) {
-      var obj = _.omit(table, ["id", "facebook_id", "createdAt", "updatedAt", "password_hash", "salt", "confirmed"]);
-      obj["password"] = { "type": "password", "allowNull": false, "primaryKey": false };
-      return res.json(new RO({success: true, response: obj}));
+      let fields = _.omit(table, ["id", "facebook_id", "createdAt", "updatedAt", "password_hash", "salt", "confirmed"]);
+      fields["password"] = { "type": "password", "allowNull": false, "primaryKey": false };
+      return res.json(new RO({success: true, response: {fields}}));
     });
   }
 

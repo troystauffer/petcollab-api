@@ -18,7 +18,9 @@ module.exports = function(sequelize, DataTypes) {
           id: this.id,
           name: this.name,
           pet_type_id: this.pet_type_id,
-          comments: this.comments
+          pet_type: this.PetType,
+          comments: this.comments,
+          transfers: this.Transfers
         };
       }
     }

@@ -21,10 +21,12 @@ module.exports = function(sequelize, DataTypes) {
           id: this.id,
           title: this.title,
           schedule_id: this.schedule_id,
+          schedule: this.Schedule,
           assigned_user_id: this.assigned_user_id,
           starts_at: this.starts_at,
           ends_at: this.ends_at,
-          order: this.order
+          order: this.order,
+          assigned_user: this.User
         };
       }
     }

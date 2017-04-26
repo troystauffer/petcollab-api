@@ -16,7 +16,9 @@ module.exports = function(sequelize, DataTypes) {
         return {
           id: this.id,
           pet_id: this.pet_id,
-          event_id: this.event_id
+          pet: this.Pet,
+          event_id: this.event_id,
+          event: this.Event
         };
       }
     }

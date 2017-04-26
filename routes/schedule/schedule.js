@@ -28,7 +28,7 @@ class Schedule extends BaseRoute {
     .then((schedule) => {
       if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.detail.not_found', message: 'No schedule found for provided id.'})]}));
       _this.log.info('Detailing schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { id: schedule.id, event_id: schedule.event_id, title: schedule.title }}));
+      return res.status(200).json(new RO({ success: true, response: {schedule}}));
     });
   }
 
@@ -43,7 +43,7 @@ class Schedule extends BaseRoute {
         title: req.body.title
       }).then((schedule) => {
         _this.log.info('Created schedule for event ' + req.params.event_id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Schedule created successfully.', response: { id: schedule.id }}));
+        return res.status(201).json(new RO({ success: true, message: 'Schedule created successfully.', response: { schedule }}));
       });
     });
   }

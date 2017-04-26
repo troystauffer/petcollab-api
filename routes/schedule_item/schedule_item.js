@@ -15,9 +15,9 @@ class ScheduleItem extends BaseRoute {
     req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.ScheduleItem.findAll({ where: { schedule_id: req.params.schedule_id }})
-    .then((items) => {
+    .then((schedule_items) => {
       _this.log.info('Listing schedule items for schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { schedule_items: items }}));
+      return res.status(200).json(new RO({ success: true, response: { schedule_items }}));
     });
   }
 
@@ -25,10 +25,10 @@ class ScheduleItem extends BaseRoute {
     req.checkParams('schedule_item_id', 'A schedule_item id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.ScheduleItem.findById(req.params.schedule_item_id)
-    .then((item) => {
-      if (!item) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.detail.not_found', message: 'No schedule_item found for provided id.'})]}));
+    .then((schedule_item) => {
+      if (!schedule_item) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.detail.not_found', message: 'No schedule_item found for provided id.'})]}));
       _this.log.info('Detailing schedule item ' + req.params.schedule_item_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { id: item.id, title: item.title, schedule_id: item.schedule_id, assigned_user_id: item.assigned_user_id, starts_at: item.starts_at, ends_at: item.ends_at, order: item.order }}));
+      return res.status(200).json(new RO({ success: true, response: {schedule_item}}));
     });
   }
 
@@ -47,9 +47,9 @@ class ScheduleItem extends BaseRoute {
         starts_at: req.body.starts_at,
         ends_at: req.body.ends_at,
         order: req.body.order || null
-      }).then((item) => {
-        _this.log.info('Created schedule item ' + item.id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Schedule item created successfully.', response: { id: schedule.id }}));
+      }).then((schedule_item) => {
+        _this.log.info('Created schedule item ' + schedule_item.id + ' for user ' + req.user.email);
+        return res.status(201).json(new RO({ success: true, message: 'Schedule item created successfully.', response: {schedule_item}}));
       });
     });
   }

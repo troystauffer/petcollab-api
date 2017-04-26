@@ -14,7 +14,7 @@ class Rescue extends BaseRoute{
   list(req, res) {
     _this.db.Rescue.findAll().then((rescues) => {
       _this.log.info('Listing rescues for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: rescues }));
+      return res.status(200).json(new RO({ success: true, response: { rescues } }));
     })
   }
 
@@ -24,7 +24,7 @@ class Rescue extends BaseRoute{
     _this.db.Rescue.findById(req.params.rescue_id).then((rescue) => {
       if (!rescue) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'rescue.detail.not_found', message: 'No rescue found for provided id.' })]}));
       _this.log.info('Detailing rescue ' + req.params.rescue_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: rescue }));
+      return res.status(200).json(new RO({ success: true, response: {rescue} }));
     });
   }
 
@@ -37,7 +37,7 @@ class Rescue extends BaseRoute{
       zip_code: req.body.zip_code
     }).then((rescue) => {
       _this.log.info('Created new rescue ' + rescue.name + ', id: ' + rescue.id + ' for user ' + req.user.email);
-      return res.status(201).json(new RO({ success: true, message: 'Rescue created successfully.', response: rescue}));
+      return res.status(201).json(new RO({ success: true, message: 'Rescue created successfully.', response: {rescue}}));
     });
   }
 

@@ -21,6 +21,7 @@ module.exports = function(sequelize, DataTypes) {
           foreignKey: 'receiving_rescue_id',
           as: 'ReceivingRescue'
         });
+        Event.hasMany(models.Transfer, { foreignKey: 'event_id' });
       }
     },
     instanceMethods: {
@@ -32,7 +33,10 @@ module.exports = function(sequelize, DataTypes) {
           ends_at: this.ends_at,
           owner_user_id: this.owner_user_id,
           releasing_rescue_id: this.releasing_rescue_id,
-          receiving_rescue_id: this.receiving_rescue_id
+          releasing_rescue: this.ReleasingRescue,
+          receiving_rescue_id: this.receiving_rescue_id,
+          receiving_rescue: this.ReceivingRescue,
+          transfers: this.Transfers
         };
       }
     }

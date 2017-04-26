@@ -28,7 +28,10 @@ module.exports = function(sequelize, DataTypes) {
           name: this.name,
           email: this.email,
           confirmed: this.confirmed,
-          role_id: this.role_id
+          role_id: this.role_id,
+          role: this.Role,
+          schedule_items: this.ScheduleItems,
+          events: this.Events
         }
       }
     }

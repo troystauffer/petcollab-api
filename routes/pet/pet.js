@@ -18,15 +18,7 @@ class Pet extends BaseRoute{
     _this.db.Pet.findAll({ include: [ _this.db.PetType, _this.db.Transfer ], order: [['created_at', 'DESC']] })
     .then((pets) => {
       _this.log.info('Listing all pets for user ' + req.user.email);
-      let response = [];
-      pets.forEach((pet) => {
-        let transfers = [];
-        pet.Transfers.forEach((transfer) => {
-          transfers.push({ id: transfer.id, pet_id: transfer.pet_id, event_id: transfer.event_id });
-        });
-        response.push({ id: pet.id, name: pet.name, pet_type_id: pet.pet_type_id, pet_type: pet.PetType.title, comments: pet.comments, transfers: transfers })
-      });
-      return res.status(200).json(new RO({ success: true, response: response }));
+      return res.status(200).json(new RO({ success: true, response: pets }));
     });
   }
 
@@ -43,7 +35,7 @@ class Pet extends BaseRoute{
       comments: req.body.comments
     }).then((pet) => {
       _this.log.info('Created new pet ' + pet.name + ', id: ' + pet.id + ' for user ' + req.user.email);
-      return res.status(201).json(new RO({ success: true, message: 'Pet created successfully.', response: { id: pet.id }}));
+      return res.status(201).json(new RO({ success: true, message: 'Pet created successfully.', response: {pet}}));
     })
   }
 
@@ -52,14 +44,8 @@ class Pet extends BaseRoute{
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Pet.findById(req.params.pet_id, { include: [ _this.db.PetType, _this.db.Transfer ]}).then((pet) => {
       if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.detail.not_found', message: 'No pet found for provided id.' })]}));
-      let petType = '';
-      if (pet.PetType) petType = pet.PetType.title;
-      let transfers = [];
-      pet.Transfers.forEach((transfer) => {
-        transfers.push({ id: transfer.id, pet_id: transfer.pet_id, event_id: transfer.event_id });
-      });
       _this.log.info('Detailing pet ' + req.params.pet_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { id: pet.id, name: pet.name, pet_type_id: pet.pet_type_id, pet_type: petType, comments: pet.comments, transfers: transfers }}));
+      return res.status(200).json(new RO({ success: true, response: { pet: pet }}));
     })
   }
 

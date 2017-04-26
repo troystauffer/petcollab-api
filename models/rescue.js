@@ -28,7 +28,9 @@ module.exports = function(sequelize, DataTypes) {
           street_address: this.street_address,
           city: this.city,
           state: this.state,
-          zip_code: this.zip_code
+          zip_code: this.zip_code,
+          releasing_events: this.ReleasingEvents,
+          receiving_events: this.ReceivingEvents
         };
       }
     }
