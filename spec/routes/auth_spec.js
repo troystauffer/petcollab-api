@@ -9,16 +9,11 @@ import PwcryptError from '../util/pwcrypt_error';
 import PwcryptInvalid from '../util/pwcrypt_invalid';
 import log from '../util/log';
 import HTTPS from '../util/https';
+import Encryption from '../util/encryption';
 
 describe('Auth', () => {
-  let res = {};
-  let req = {};
-  let authRoutes = {};
-  let pwcrypt = {};
-  let pwcryptError = {};
-  let pwcryptInvalid = {};
-  let https = {};
-  let jws = {};
+  let res, req, authRoutes, pwcrypt, pwcryptError, pwcryptInvalid, https, jws = {};
+  let encryption = new Encryption();
   const config = { 'facebook': { 'ogurl': '', 'clientID': '', 'clientSecret': '', 'redirectUri': '' }, jws: { algorithm: 'fake' }};
   
   beforeEach(() => {
@@ -29,7 +24,7 @@ describe('Auth', () => {
     pwcryptInvalid = new PwcryptInvalid();
     https = new HTTPS();
     jws = new JWS();
-    authRoutes = new Auth({ 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https });
+    authRoutes = new Auth({ 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https, 'encryption': encryption });
   })
 
   describe('standard authentication', () => {
@@ -83,7 +78,7 @@ describe('Auth', () => {
         email: 'testunit@example.com',
         password: 'password'
       };
-      validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "jsonwebtoken"} }, 200, authRoutes.authenticate);
+      validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "encrypted"} }, 200, authRoutes.authenticate);
       expect(pwcrypt.calls.verify).toEqual(1);
       expect(jws.calls.sign).toEqual(1);
     });
@@ -100,7 +95,7 @@ describe('Auth', () => {
 
     it('should authenticate successfully', () => {
       req.body = { code: 'facebookcode' };
-      validate(req, res, { success: true, message: 'Authenticated successfully.', response: {token: 'jsonwebtoken'} }, 200, authRoutes.facebook);
+      validate(req, res, { success: true, message: 'Authenticated successfully.', response: {token: 'encrypted'} }, 200, authRoutes.facebook);
       expect(https.calls.request).toEqual(2);
       expect(jws.calls.sign).toEqual(1);
     });

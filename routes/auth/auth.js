@@ -31,6 +31,7 @@ class Auth extends BaseRoute {
           return res.status(200).json(new RO({ success:true, message: 'Authenticated successfully.', response: {token: token}}));
         });
       } catch(err) {
+console.log('err', err)
         _this.log.info('An error occurred decrypting the password for ' + req.body.email);
         return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'auth.authenticate.unspecified', message: 'An error occurred. See errors for details.', validations: err })]}));
       }
