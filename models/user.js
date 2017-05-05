@@ -22,7 +22,7 @@ module.exports = function(sequelize, DataTypes) {
       isConfirmed: function(done) {
         return done(confirmed != null);
       },
-      toJSON: () => {
+      toJSON: function() {
         return {
           id: this.id,
           name: this.name,

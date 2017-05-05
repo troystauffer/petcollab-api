@@ -25,7 +25,9 @@ class User extends BaseRoute {
   }
 
   info(req, res) {
-    return res.status(200).json(new RO({success: true, response: {user: req.user}}));
+    _this.db.User.findById(req.user.user_id).then((user) => {
+      return res.status(200).json(new RO({success: true, response: { user }}));
+    });
   }
 
   error(req, res) {
@@ -69,7 +71,7 @@ class User extends BaseRoute {
     req.checkBody('password', 'A valid password is required.').notEmpty();
     req.checkBody('name', 'A valid name is required.').notEmpty();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.pwcrypt.secureHash(req.body.password, function( err, passwordHash, salt ) {
+    _this.pwcrypt.secureHash(req.body.password, (err, passwordHash, salt) => {
       if (err) return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.create.unspecified', message: 'An error occurred. See validations for details.', validations: err })]}));
       _this.db.User.findOrCreate({ where: { email: req.body.email }})
       .spread(function(user, created) {
@@ -89,6 +91,26 @@ class User extends BaseRoute {
               return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.create.unspecified', message: 'An error occurred creating the account. See validations for details.', validations: err })]}));
             }
           });
+        });
+      });
+    });
+  }
+
+  update(req, res) {
+    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    _this.db.User.findById(req.user.user_id).then((user) => {
+      if (req.body.name) user.name = req.body.name;
+      _this.pwcrypt.secureHash(req.body.password || '', (err, passwordHash, salt) => {
+        if (err) return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.update.unspecified', message: 'An error occurred. See validations for details.', validations: err })]}));
+        if (passwordHash !== '') user.password_hash = passwordHash;
+        if (salt !== '') user.salt = salt;
+        user.save()
+        .then((user) => {
+          if (user) {
+            return res.status(201).json(new RO({success: true, message: 'Account updated successfully.' }));
+          } else {
+            return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.update.unspecified', message: 'An error occurred updating the account. See validations for details.', validations: err })]}));
+          }
         });
       });
     });
