@@ -82,7 +82,7 @@ describe('Event', () => {
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(3);
     });
-    xit('should create an event', () => {
+    it('should create an event', () => {
       let event = {
         id: 1,
         title: 'Test Event',
@@ -90,7 +90,7 @@ describe('Event', () => {
         ends_at: '2017-04-16 12:00:00 GMT'
       };
       req.body = event;
-      validate(req, res, { success: true, message: 'Event created successfully.', response: { id: 1, 'title': 'Test Event', 'starts_at': '2017-04-15 12:00:00 GMT', 'ends_at': '2017-04-16 12:00:00 GMT', owner_user_id: 1 }}, 201, eventRoutes.create);
+      validate(req, res, { success: true, message: 'Event created successfully.', response: { event: { id: 1, 'title': 'Test Event', 'starts_at': '2017-04-15 12:00:00 GMT', 'ends_at': '2017-04-16 12:00:00 GMT', owner_user_id: 1 }}}, 201, eventRoutes.create);
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(3);
     });
@@ -114,10 +114,10 @@ describe('Event', () => {
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should display the details of an event', () => {
+    it('should display the details of an event', () => {
       req.params = { id: 1 };
       req.user = { user_id: 1 };
-      validate(req, res, { success: true, response: { id: 1, owner_user_id: 1, title: 'Test Event', starts_at: '2017-04-15 12:00:00 GMT', ends_at: '2017-04-16 12:00:00 GMT' }}, 200, eventRoutes.detail);
+      validate(req, res, { success: true, response: { event: { id: 1, owner_user_id: 1, title: 'Test Event', starts_at: '2017-04-15 12:00:00 GMT', ends_at: '2017-04-16 12:00:00 GMT' }}}, 200, eventRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

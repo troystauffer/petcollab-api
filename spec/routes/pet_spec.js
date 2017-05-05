@@ -17,11 +17,11 @@ describe('Pet', () => {
   })
 
   describe('listing', () => {
-    xit('should return a list of pets', () => {
+    it('should return a list of pets', () => {
       let pets = [
-        { id: 1, 'name': 'Test Pet', pet_type_id: 1, pet_type: 'Dog', comments: 'Good dog.', transfers: [{ id: 1, pet_id: 1, event_id: 1 }] }
+        { id: 1, 'name': 'Test Pet', pet_type_id: 1, comments: 'Good dog.', PetType: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }] }
       ];
-      validate(req, res, { success: true, response: pets}, 200, petRoutes.list);
+      validate(req, res, { success: true, response: { pets }}, 200, petRoutes.list);
     });
   });
 
@@ -34,7 +34,7 @@ describe('Pet', () => {
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
     });
-    xit('should create a pet', () => {
+    it('should create a pet', () => {
       let pet = {
         id: 1,
         name: 'Test Pet',
@@ -42,7 +42,7 @@ describe('Pet', () => {
         comments: 'Good dog.'
       };
       req.body = pet;
-      validate(req, res, { success: true, message: 'Pet created successfully.', response: { id: pet.id} }, 201, petRoutes.create);
+      validate(req, res, { success: true, message: 'Pet created successfully.', response: { pet: { id: 1, name: 'Test Pet', pet_type_id: 1, comments: 'Good dog.', PetType: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }]}}}, 201, petRoutes.create);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
     });
@@ -66,9 +66,9 @@ describe('Pet', () => {
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should display the details of an pet', () => {
+    it('should display the details of an pet', () => {
       req.params = { id: 1 };
-      validate(req, res, { success: true, response: { id: 1, pet_type_id: 1, pet_type: 'Dog', name: 'Test Pet', comments: 'Good dog.', transfers: [{ id: 1, pet_id: 1, event_id: 1 }] }}, 200, petRoutes.detail);
+      validate(req, res, { success: true, response: { pet: { id: 1, name: 'Test Pet', pet_type_id: 1, comments: 'Good dog.', PetType: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }]}}}, 200, petRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

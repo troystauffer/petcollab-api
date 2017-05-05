@@ -18,7 +18,7 @@ class Pet extends BaseRoute{
     _this.db.Pet.findAll({ include: [ _this.db.PetType, _this.db.Transfer ], order: [['created_at', 'DESC']] })
     .then((pets) => {
       _this.log.info('Listing all pets for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: pets }));
+      return res.status(200).json(new RO({ success: true, response: { pets }}));
     });
   }
 

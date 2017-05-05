@@ -53,7 +53,7 @@ class Event extends BaseRoute{
       receiving_rescue_id: req.body.receiving_rescue_id
     }).then((event) => {
       _this.log.info('Created new event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
-      return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: event}));
+      return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: { event }}));
     })
   }
 

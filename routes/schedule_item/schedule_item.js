@@ -49,7 +49,7 @@ class ScheduleItem extends BaseRoute {
         order: req.body.order || null
       }).then((schedule_item) => {
         _this.log.info('Created schedule item ' + schedule_item.id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Schedule item created successfully.', response: {schedule_item}}));
+        return res.status(201).json(new RO({ success: true, message: 'Schedule item created successfully.', response: { schedule_item }}));
       });
     });
   }

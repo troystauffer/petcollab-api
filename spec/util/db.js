@@ -35,40 +35,24 @@ let user = {
     }, true);
   }
 };
+let eventData = {
+  id: 1,
+  title: 'Test Event',
+  starts_at: '2017-04-15 12:00:00 GMT',
+  ends_at: '2017-04-16 12:00:00 GMT',
+  owner_user_id: 1
+}
 let event = {
   then: function(callback) {
-    callback({
-      id: 1,
-      title: 'Test Event',
-      starts_at: '2017-04-15 12:00:00 GMT',
-      ends_at: '2017-04-16 12:00:00 GMT',
-      owner_user_id: 1,
-      update: function() {
-        return {
-          then: function(callback) {
-            callback({
-              id: 1,
-              title: 'Test Event',
-              starts_at: '2017-04-15 12:00:00 GMT',
-              ends_at: '2017-04-16 12:00:00 GMT',
-              owner_user_id: 1
-            });
-          }
-        }
-      },
+    callback(Object.assign({
+      update: function() { return { then: function(callback) { callback(eventData); }}},
       destroy: function() {}
-    });
+    }, eventData));
   }
 };
 let events = {
   then: function(callback) {
-    callback([{
-      id:1,
-      title: 'Test Event',
-      starts_at: '2017-04-15 12:00:00 GMT',
-      ends_at: '2017-04-16 12:00:00 GMT',
-      owner_user_id: 1
-    }])
+    callback([eventData])
   }
 }
 let rescueData = {
@@ -81,7 +65,10 @@ let rescueData = {
 }
 let rescue = {
   then: function(callback) {
-    callback(rescueData);
+    callback(Object.assign({
+      update: function() { return { then: function(callback) { callback(rescueData)}}},
+      destroy: function() {}
+    }, rescueData));
   }
 };
 let rescues = {
@@ -229,12 +216,11 @@ let role = {
 let transferData = {
   id: 1,
   pet_id: 1,
-  event_id: 1,
-  destroy: function() { return true; }
+  event_id: 1
 };
 let transfer = {
   then: function(callback) {
-    callback(transferData);
+    callback(Object.assign({destroy: function() { return true; }}, transferData));
     return { then: function(callback) {
       callback();
     }}

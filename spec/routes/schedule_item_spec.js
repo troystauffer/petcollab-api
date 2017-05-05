@@ -65,16 +65,17 @@ describe('Schedule item', () => {
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(2);
     });
-    xit('should create a schedule item', () => {
+    it('should create a schedule item', () => {
       req.params = { id: 1 };
-      req.body = {
-        title: 'Test Item',
+      let si = {
+        title: 'Test Schedule Item',
         assigned_user_id: 1,
         order: 1,
-        starts_at: '2017-04-15 12:00:00 GMT',
-        ends_at: '2017-04-16 12:00:00 GMT'
+        starts_at: '2017-04-15T12:00:00.000Z',
+        ends_at: '2017-04-16T12:00:00.000Z'
       };
-      validate(req, res, { success: true, message: 'Schedule item created successfully.', response: { id: 1 }}, 201, scheduleItemRoutes.create);
+      req.body = si;
+      validate(req, res, { success: true, message: 'Schedule item created successfully.', response: { schedule_item: Object.assign({ id: 1, schedule_id: 1 }, si)}}, 201, scheduleItemRoutes.create);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
@@ -100,9 +101,9 @@ describe('Schedule item', () => {
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should display the details of an event', () => {
+    it('should display the details of an event', () => {
       req.params = { id: 1 };
-      validate(req, res, { success: true, response: { id: 1, title: "Test Schedule Item", schedule_id: 1, assigned_user_id: 1, starts_at: "2017-04-15T12:00:00.000Z", ends_at: "2017-04-16T12:00:00.000Z", order: 1 }}, 200, scheduleItemRoutes.detail);
+      validate(req, res, { success: true, response: { schedule_item: { id: 1, title: "Test Schedule Item", schedule_id: 1, assigned_user_id: 1, starts_at: "2017-04-15T12:00:00.000Z", ends_at: "2017-04-16T12:00:00.000Z", order: 1 }}}, 200, scheduleItemRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

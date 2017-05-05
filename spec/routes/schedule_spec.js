@@ -61,10 +61,10 @@ describe('Schedule', () => {
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should create a schedule', () => {
+    it('should create a schedule', () => {
       req.params = { event_id: 1 };
       req.body = { title: 'Test Schedule' };
-      validate(req, res, { success: true, message: 'Schedule created successfully.', response: { id: 1 }}, 201, scheduleRoutes.create);
+      validate(req, res, { success: true, message: 'Schedule created successfully.', response: { schedule: { id: 1, title: 'Test Schedule', event_id: 1 }}}, 201, scheduleRoutes.create);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(2);
@@ -90,9 +90,9 @@ describe('Schedule', () => {
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
     });
-    xit('should display the details of a schedule', () => {
+    it('should display the details of a schedule', () => {
       req.params = { schedule_id: 1 };
-      validate(req, res, { success: true, response: { id: 1, event_id: 1, title: 'Test Schedule' }}, 200, scheduleRoutes.detail);
+      validate(req, res, { success: true, response: { schedule: { id: 1, event_id: 1, title: 'Test Schedule' }}}, 200, scheduleRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
