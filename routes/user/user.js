@@ -97,7 +97,6 @@ class User extends BaseRoute {
   }
 
   update(req, res) {
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.User.findById(req.user.user_id).then((user) => {
       if (req.body.name) user.name = req.body.name;
       _this.pwcrypt.secureHash(req.body.password || '', (err, passwordHash, salt) => {

@@ -18,6 +18,10 @@ global.validate = function(req, res, expectedResult, expectedStatus, execute) {
           delete res.response.response.schedule.update;
           delete res.response.response.schedule.destroy;
         }
+        if (res.response.response.hasOwnProperty("user")) {
+          delete res.response.response.user.save;
+          delete res.response.response.user.setRole;
+        }
         if (res.response.response.hasOwnProperty("schedule_item")) {
           delete res.response.response.schedule_item.update;
           delete res.response.response.schedule_item.destroy;

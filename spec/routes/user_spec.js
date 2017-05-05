@@ -26,7 +26,7 @@ describe('User', () => {
 
   describe('misc endpoints', () => {
     it('should return user info', () => {
-      validate(req, res, { success: true, response: { user: {user_id: 1} }}, 200, userRoutes.info);
+      validate(req, res, { success: true, response: { user: {id: 1} }}, 200, userRoutes.info);
     });
 
     it('should return a well formed error', () => {
@@ -124,6 +124,17 @@ describe('User', () => {
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
       expect(req.calls.validationErrors).toEqual(1);
+    });
+  });
+
+  describe('editing', () => {
+    it('should update a user', () => {
+      let user = {
+        name: 'Update Name',
+        password: 'password'
+      };
+      req.body = user;
+      validate(req, res, { success: true, message: 'Account updated successfully.' }, 201, userRoutes.update);
     });
   });
 

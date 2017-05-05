@@ -306,7 +306,8 @@ module.exports = {
     findOne: function() { return user; },
     create: function() { return user; },
     findOrCreate: function() { return user; },
-    describe: function() { return userDescribe; }
+    describe: function() { return userDescribe; },
+    findById: function() { return user; }
   },
   Role: {
     findOne: function() { return role; }
