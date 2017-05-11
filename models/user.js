@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     instanceMethods: {
       isConfirmed: function(done) {
-        return done(confirmed != null);
+        return done(this.confirmed != null);
       },
       toJSON: function() {
         return {
@@ -32,7 +32,7 @@ module.exports = function(sequelize, DataTypes) {
           role: this.Role,
           schedule_items: this.ScheduleItems,
           events: this.Events
-        }
+        };
       }
     }
   });

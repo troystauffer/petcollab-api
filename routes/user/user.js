@@ -36,8 +36,8 @@ class User extends BaseRoute {
 
   fields(req, res) {
     _this.db.User.describe().then(function(table) {
-      let fields = _.omit(table, ["id", "facebook_id", "createdAt", "updatedAt", "password_hash", "salt", "confirmed"]);
-      fields["password"] = { "type": "password", "allowNull": false, "primaryKey": false };
+      let fields = _.omit(table, ['id', 'facebook_id', 'createdAt', 'updatedAt', 'password_hash', 'salt', 'confirmed']);
+      fields['password'] = { 'type': 'password', 'allowNull': false, 'primaryKey': false };
       return res.json(new RO({success: true, response: {fields}}));
     });
   }
@@ -58,11 +58,11 @@ class User extends BaseRoute {
           } else {
             return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.confirm.token_error', message: 'An error occurred redeeming the token.' })]}));
           }
-        })
+        });
       } else {
         return res.status(400).json(new RO({success: false, errors: [new ApiError({ type: 'user.confirm.params.invalid', message: 'Email or token are invalid.' })]}));
       }
-    })
+    });
   }
 
   create(req, res, role) {
@@ -125,7 +125,7 @@ class User extends BaseRoute {
           return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'user.user.not_authorized', message: 'User not authorized.' })]}));
         }
       });
-    }
+    };
   }
 }
 

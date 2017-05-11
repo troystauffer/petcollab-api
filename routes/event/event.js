@@ -54,7 +54,7 @@ class Event extends BaseRoute{
     }).then((event) => {
       _this.log.info('Created new event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
       return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: { event }}));
-    })
+    });
   }
 
   update(req, res) {
@@ -126,8 +126,8 @@ class Event extends BaseRoute{
           _this.log.info('Access denied for user ' + req.user.user_id);
           return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'event.user.not_authorized', message: 'User is not authorized to view or modify the specified event.'})]}));
         }
-      })
-    }
+      });
+    };
   }
 }
 

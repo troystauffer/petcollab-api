@@ -4,7 +4,7 @@
   "description": "The Node/Express API for the rescue animal transportation app.",
   "main": "index.js",
   "scripts": {
-    "test": "babel-node spec/run.js",
+    "test": "babel-node spec/run.js && eslint .",
     "start": "babel-node index.js",
     "watch": "babel-watch index.js"
   },
@@ -49,8 +49,9 @@
     "supertest": "^2.0.1"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
     "chai": "^3.5.0",
-    "eslint": "^1.9.0",
+    "eslint": "^1.10.3",
     "jasmine": "^2.5.3",
     "mocha": "^3.2.0",
     "sequelize-cli": "^2.5.1",

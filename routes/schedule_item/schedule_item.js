@@ -126,7 +126,7 @@ class ScheduleItem extends BaseRoute {
           return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.user.not_authorized', message: 'User is not authorized.'})]}));
         }
       });
-    }
+    };
   }
 }
 

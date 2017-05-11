@@ -36,7 +36,7 @@ class Pet extends BaseRoute{
     }).then((pet) => {
       _this.log.info('Created new pet ' + pet.name + ', id: ' + pet.id + ' for user ' + req.user.email);
       return res.status(201).json(new RO({ success: true, message: 'Pet created successfully.', response: {pet}}));
-    })
+    });
   }
 
   detail(req, res) {
@@ -46,7 +46,7 @@ class Pet extends BaseRoute{
       if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.detail.not_found', message: 'No pet found for provided id.' })]}));
       _this.log.info('Detailing pet ' + req.params.pet_id + ' for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, response: { pet: pet }}));
-    })
+    });
   }
 
   update(req, res) {
@@ -97,9 +97,9 @@ class Pet extends BaseRoute{
           _this.db.Transfer.create({
             pet_id: req.params.pet_id,
             event_id: req.params.event_id
-          }).then((transfer) => {
+          }).then(() => {
             return res.status(201).json(new RO({ success: true, message: 'Transfer created.' }));
-          })
+          });
         });
       });
     });

@@ -17,8 +17,8 @@ class BaseRoute {
           _this.log.info('Access denied for user ' + req.user.user_id);
           return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'user.not_authorized', message: 'User is not authorized to view or modify the specified resource.'})]}));
         }
-      })
-    }
+      });
+    };
   }
 
   hasRole(user, roles, cb) {
@@ -33,11 +33,11 @@ class BaseRoute {
             } else {
               cb(false);
             }
-          })
+          });
         } else {
           cb(false);
         }
-      })
+      });
     } else {
       cb(false);
     }

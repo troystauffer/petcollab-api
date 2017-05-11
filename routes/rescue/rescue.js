@@ -1,7 +1,6 @@
 import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
-import _ from 'lodash';
 
 let _this = {};
 
@@ -15,7 +14,7 @@ class Rescue extends BaseRoute{
     _this.db.Rescue.findAll().then((rescues) => {
       _this.log.info('Listing rescues for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, response: { rescues }}));
-    })
+    });
   }
 
   detail(req, res) {

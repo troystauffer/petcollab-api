@@ -20,9 +20,6 @@ const jws = require('jws');
 const https = require('https');
 // persistance
 const db = new (require(path.join(__dirname, 'models/')))(config.database, log);
-const redis = require('redis');
-const expressSession = require('express-session');
-const RedisStore = require('connect-redis')(expressSession);
 // security
 const EasyPbkdf2 = require('easy-pbkdf2');
 const pwcrypt = EasyPbkdf2(config.easyPbkdf2);
