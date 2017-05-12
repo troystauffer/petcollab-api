@@ -118,9 +118,8 @@ describe('Schedule item', () => {
       req.validationErrors = function() { return validationErrors };
       validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleItemRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
-      expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
-      expect(req.calls.isNumeric).toEqual(2);
+      expect(req.calls.isNumeric).toEqual(1);
     });
     it('should update a schedule item', () => {
       req.params = { id: 1 };
@@ -133,9 +132,8 @@ describe('Schedule item', () => {
       };
       validate(req, res, { success: true, message: 'Schedule item updated successfully.' }, 201, scheduleItemRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
-      expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
-      expect(req.calls.isNumeric).toEqual(2);
+      expect(req.calls.isNumeric).toEqual(1);
     });
   });
 
@@ -155,5 +153,5 @@ describe('Schedule item', () => {
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
     })
-  })
+  });
 });

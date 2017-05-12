@@ -6,7 +6,8 @@ module.exports = function(sequelize, DataTypes) {
     assigned_user_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Users', key: 'id' }, validate: { notEmpty: true, isNumeric: true }},
     starts_at: { type: DataTypes.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
     ends_at: { type: DataTypes.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
-    order: DataTypes.INTEGER
+    order: DataTypes.INTEGER,
+    checked_in_at: { type: DataTypes.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }}
   }, {
     underscored: true,
     classMethods: {
@@ -26,7 +27,8 @@ module.exports = function(sequelize, DataTypes) {
           starts_at: this.starts_at,
           ends_at: this.ends_at,
           order: this.order,
-          assigned_user: this.User
+          assigned_user: this.User,
+          checked_in_at: this.checked_in_at
         };
       }
     }

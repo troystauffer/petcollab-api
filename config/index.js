@@ -35,6 +35,7 @@ module.exports = function(){
         dialect: 'sqlite',
         storage: './petcollab-db.development.sqlite',
         logging: false
+        // logging: console.log
       },
       log: {
         name: 'petcollab-api-dev',

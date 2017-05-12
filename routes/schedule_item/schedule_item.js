@@ -56,20 +56,21 @@ class ScheduleItem extends BaseRoute {
 
   update(req, res) {
     req.checkParams('schedule_item_id', 'A schedule item id is required.').notEmpty().isNumeric();
-    req.checkBody('assigned_user_id', 'User id must be numeric').isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
+    req.sanitizeBody('checked_in_at').toDate();
     _this.db.ScheduleItem.findById(req.params.schedule_item_id)
     .then((item) => {
       if (!item) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.update.not_found', message: 'No schedule_item found for provided id.'})]}));
-      item.update({
-        assigned_user_id: req.body.assigned_user_id || null,
-        title: req.body.title || null,
-        starts_at: req.body.starts_at,
-        ends_at: req.body.ends_at,
-        order: req.body.order || null
-      }).then((item) => {
+      let updateParams = {};
+      if (req.body.assigned_user_id) updateParams['assigned_user_id'] = req.body.assigned_user_id;
+      if (req.body.title) updateParams['title'] = req.body.title;
+      if (req.body.starts_at) updateParams['starts_at'] = req.body.starts_at;
+      if (req.body.ends_at) updateParams['ends_at'] = req.body.ends_at;
+      if (req.body.order) updateParams['order'] = req.body.order;
+      if (req.body.checked_in_at) updateParams['checked_in_at'] = req.body.checked_in_at;
+      item.update(updateParams).then((item) => {
         _this.log.info('Updated schedule item ' + item.id + ' for user ' + req.user.email);
         return res.status(201).json(new RO({ success: true, message: 'Schedule item updated successfully.' }));
       });
@@ -108,8 +109,8 @@ class ScheduleItem extends BaseRoute {
                   return next();
                 }
               });
-            } else {
-              _this.db.ScheduleItem.findOne({ where: { id: req.params.schedule_item_id }, include: [{ model: _this.db.Schedule, include: [{ model: _this.db.Event, where: { owner_user_id: req.user.user_id }}]}]})
+            } else if (req.params.schedule_item_id) {
+              _this.db.ScheduleItem.findOne({ where: { id: req.params.schedule_item_id, $or: [{ assigned_user_id: req.user.user_id }, { 'event.owner_user_id': req.user.user_id }]}, include: [{ model: _this.db.Schedule, as: 'schedule', include: [{ model: _this.db.Event, as: 'event' }]}]})
               .then((item) => {
                 if (item) {
                   _this.log.info('Access granted for user ' + req.user.email);

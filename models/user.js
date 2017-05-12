@@ -14,7 +14,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         User.belongsTo(models.Role, { foreignKey: 'role_id' });
-        User.hasMany(models.ScheduleItem, {_foreignKey: 'assigned_user_id' });
+        User.hasMany(models.ScheduleItem, { foreignKey: 'assigned_user_id' });
         User.hasMany(models.Event, { foreignKey: 'owner_user_id' });
       }
     },
