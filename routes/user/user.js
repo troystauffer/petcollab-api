@@ -1,7 +1,6 @@
 import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
-import _ from 'lodash';
 
 let _this = {};
 
@@ -32,14 +31,6 @@ class User extends BaseRoute {
 
   error(req, res) {
     return res.status(400).json(new RO({success: false, errors: [new ApiError({ type: 'user.error', message: 'An error occurred.' })]}));
-  }
-
-  fields(req, res) {
-    _this.db.User.describe().then(function(table) {
-      let fields = _.omit(table, ['id', 'facebook_id', 'createdAt', 'updatedAt', 'password_hash', 'salt', 'confirmed']);
-      fields['password'] = { 'type': 'password', 'allowNull': false, 'primaryKey': false };
-      return res.json(new RO({success: true, response: {fields}}));
-    });
   }
 
   confirm(req, res) {

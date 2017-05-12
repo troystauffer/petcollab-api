@@ -13,7 +13,7 @@ class Event extends BaseRoute{
   }
 
   list(req, res) {
-    _this.db.Event.findAll({ order: [['starts_at', 'DESC']] })
+    _this.db.Event.findAll({ order: [['starts_at', 'DESC']], include: [_this.db.User]})
     .then((events) => {
       _this.log.info('Listing all events for user ' + req.user.email);
       return res.status(200).json(new RO({ success: true, response: { events }}));
@@ -23,7 +23,7 @@ class Event extends BaseRoute{
   detail(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Event.findById(req.params.event_id, { include: [{ model: _this.db.Transfer, include: [_this.db.Pet]}, { model: _this.db.Rescue, as:'ReleasingRescue' }, { model: _this.db.Rescue, as:'ReceivingRescue' }]})
+    _this.db.Event.findById(req.params.event_id, { include: [{ model: _this.db.Transfer, include: [_this.db.Pet]}, { model: _this.db.Rescue, as:'ReleasingRescue' }, { model: _this.db.Rescue, as:'ReceivingRescue' }, _this.db.User]})
     .then((event) => {
       if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.detail.not_found', message: 'No event found for provided id.' })]}));
       _this.log.info('Detailing event ' + req.params.event_id + ' for user ' + req.user.email);
@@ -44,14 +44,15 @@ class Event extends BaseRoute{
     if (!req.body.starts_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.create.starts_at.invalid', message: 'Invalid start date.' })]}));
     if (!req.body.ends_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.create.ends_at.invalid', message: 'Invalid end date.' })]}));
     if (!req.body.owner_user_id) req.body.owner_user_id = req.user.user_id;
-    _this.db.Event.create({
+    let eventParams = {
       title: req.body.title,
       starts_at: req.body.starts_at,
-      ends_at: req.body.ends_at,
-      owner_user_id: req.body.owner_user_id,
-      releasing_rescue_id: req.body.releasing_rescue_id,
-      receiving_rescue_id: req.body.receiving_rescue_id
-    }).then((event) => {
+      ends_at: req.body.ends_at
+    };
+    if (req.body.owner_user_id) eventParams['owner_user_id'] = req.body.owner_user_id;
+    if (req.body.releasing_rescue_id) eventParams['releasing_rescue_id'] = req.body.releasing_rescue_id;
+    if (req.body.receiving_rescue_id) eventParams['receiving_rescue_id'] = req.body.receiving_rescue_id;
+    _this.db.Event.create(eventParams).then((event) => {
       _this.log.info('Created new event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
       return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: { event }}));
     });

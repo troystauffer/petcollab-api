@@ -32,10 +32,6 @@ describe('User', () => {
     it('should return a well formed error', () => {
       validate(req, res, { success: false, errors: [{ type: 'user.error', message: 'An error occurred.' }]}, 400, userRoutes.error);
     });
-
-    it('should return the user fields', () => {
-      validate(req, res, { success: true, response: {fields: userDescribe}}, 200, userRoutes.fields);
-    });
   });
 
   describe('creation', () => {
