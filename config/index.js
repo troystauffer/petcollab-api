@@ -39,16 +39,8 @@ module.exports = function(){
       },
       log: {
         name: 'petcollab-api-dev',
-        streams: [
-          {
-            level: 'info',
-            stream: process.stdout
-          },
-          {
-            level: 'error',
-            stream: process.stdout
-          }
-        ]
+        level: 'info',
+        stream: process.stdout
       },
       morgan: {
         format: 'dev',
