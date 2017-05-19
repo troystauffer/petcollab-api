@@ -1,12 +1,12 @@
 class UserRoutes {
   constructor(router, args) {
     const user = new (require('./user'))(args);
-    router.get('/user', user.info);
-    router.get('/user/error', user.error);
-    router.post('/user', user.createUser);
-    router.post('/user/confirm', user.confirm);
-    router.post('/admin/user', user.isAuthorized(['super_admin']), user.createAdmin);
-    router.patch('/user', user.update);
+    router.get('/users/info.:format?', user.info);
+    router.get('/users/error.:format?', user.error);
+    router.post('/users.:format?', user.createUser);
+    router.post('/users/confirm.:format?', user.confirm);
+    router.post('/admin/users.:format?', user.isAuthorized(['super_admin']), user.createAdmin);
+    router.patch('/users.:format?', user.update);
   }
 }
 

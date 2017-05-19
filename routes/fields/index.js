@@ -1,8 +1,8 @@
 class FieldsRoutes {
   constructor(router, args) {
     const fields = new (require('./fields'))(args);
-    router.get('/fields/event', fields.event);
-    router.get('/fields/user', fields.user);
+    router.get('/fields/event.:format?', fields.event);
+    router.get('/fields/user.:format?', fields.user);
   }
 }
 
