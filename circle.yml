@@ -6,4 +6,4 @@ machine:
 dependencies:
   pre:
     - npm install sqlite3 sequelize sequelize-cli
-    - sequelize db:migrate
+    - ./node_modules/sequelize-cli/bin/sequelize db:migrate
