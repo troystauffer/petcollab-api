@@ -5,5 +5,5 @@ machine:
     version: 5.0.0
 dependencies:
   pre:
-    - npm install sqlite3 sequelize-cli
-    - ./node_modules/sequelize-cli/bin/sequelize db:migrate
+    - npm install sqlite3 sequelize sequelize-cli
+    - sequelize db:migrate
