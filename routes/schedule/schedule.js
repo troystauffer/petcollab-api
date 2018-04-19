@@ -16,11 +16,7 @@ class Schedule extends BaseRoute {
   list(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Schedule.findAll({ where: { event_id: req.params.event_id }})
-    .then((schedules) => {
-      _this.log.info('Listing schedules for event ' + req.params.event_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { schedules }}));
-    });
+    Crud.list({ classname: 'Schedule', foreignKeyClassname: 'event', foreignKeyValue: req.params.schedule_id, db: _this.db, res: res });
   }
 
   detail(req, res) {

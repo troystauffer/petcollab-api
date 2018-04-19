@@ -76,11 +76,7 @@ class User extends BaseRoute {
           user.setRole(role);
           user.save()
           .then(function(user) {
-            if (user) {
-              return res.status(201).json(new RO({success: true, message: 'Account created successfully.' }));
-            } else {
-              return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.create.unspecified', message: 'An error occurred creating the account. See validations for details.', validations: err })]}));
-            }
+            return validateUser(user, res, err);
           });
         });
       });
@@ -96,11 +92,7 @@ class User extends BaseRoute {
         if (salt !== '') user.salt = salt;
         user.save()
         .then((user) => {
-          if (user) {
-            return res.status(201).json(new RO({success: true, message: 'Account updated successfully.' }));
-          } else {
-            return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.update.unspecified', message: 'An error occurred updating the account. See validations for details.', validations: err })]}));
-          }
+          return validateUser(user, res, err);
         });
       });
     });
@@ -119,5 +111,15 @@ class User extends BaseRoute {
     };
   }
 }
+
+function validateUser(user, res, err) {
+  if (user) {
+    return res.status(201).json(new RO({success: true, message: 'Account updated successfully.' }));
+  } else {
+    return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.create.unspecified', message: 'An error occurred creating the account. See validations for details.', validations: err })]}));
+  }
+}
+
+
 
 module.exports = User;

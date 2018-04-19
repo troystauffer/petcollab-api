@@ -15,11 +15,7 @@ class ScheduleItem extends BaseRoute {
   list(req, res) {
     req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.ScheduleItem.findAll({ where: { schedule_id: req.params.schedule_id }})
-    .then((schedule_items) => {
-      _this.log.info('Listing schedule items for schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { schedule_items }}));
-    });
+    Crud.list({ classname: 'ScheduleItem', foreignKeyClassname: 'Schedule', foreignKeyValue: req.params.schedule_id, db: _this.db, res: res });
   }
 
   detail(req, res) {

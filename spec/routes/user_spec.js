@@ -15,7 +15,7 @@ describe('User', () => {
   let pwcrypt = {};
   let userToken = {};
   const config = { 'confirmationTokenLength': 6 };
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -98,7 +98,7 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      validate(req, res, { success: true, "message": "Account created successfully." }, 201, userRoutes.create);
+      validate(req, res, { success: true, "message": "Account updated successfully." }, 201, userRoutes.create);
       expect(pwcrypt.calls.secureHash).toEqual(1);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
