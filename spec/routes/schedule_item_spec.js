@@ -9,7 +9,7 @@ describe('Schedule item', () => {
   let res = {};
   let req = {};
   let scheduleItemRoutes = {};
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -148,7 +148,7 @@ describe('Schedule item', () => {
     });
     it('should delete a schedule item', () => {
       req.params = { id: 1 };
-      validate(req, res, { success: true, message: 'Schedule item deleted.' }, 200, scheduleItemRoutes.delete);
+      validate(req, res, { success: true, message: 'Schedule Item deleted.' }, 200, scheduleItemRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

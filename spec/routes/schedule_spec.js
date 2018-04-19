@@ -9,7 +9,7 @@ describe('Schedule', () => {
   let res = {};
   let req = {};
   let scheduleRoutes = {};
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();

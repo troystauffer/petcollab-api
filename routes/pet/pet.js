@@ -2,6 +2,7 @@ import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
 import _ from 'lodash';
+import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -72,15 +73,7 @@ class Pet extends BaseRoute{
   }
 
   delete(req, res) {
-    req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Pet.findById(req.params.pet_id)
-    .then((pet) => {
-      if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.delete.not_found', message: 'No pet found for provided id.' })]}));
-      pet.destroy();
-      _this.log.info('Deleted pet ' + req.params.pet_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, message: 'Pet deleted.' }));
-    });
+    Crud.delete({ classname: 'Pet', db: _this.db, req: req, res: res });
   }
 
   transfer(req, res) {

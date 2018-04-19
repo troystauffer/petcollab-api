@@ -2,6 +2,7 @@ import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
 import _ from 'lodash';
+import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -22,14 +23,7 @@ class ScheduleItem extends BaseRoute {
   }
 
   detail(req, res) {
-    req.checkParams('schedule_item_id', 'A schedule_item id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.ScheduleItem.findById(req.params.schedule_item_id)
-    .then((schedule_item) => {
-      if (!schedule_item) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.detail.not_found', message: 'No schedule_item found for provided id.'})]}));
-      _this.log.info('Detailing schedule item ' + req.params.schedule_item_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: {schedule_item}}));
-    });
+    Crud.detail({ classname: 'ScheduleItem', db: _this.db, req: req, res: res });
   }
 
   create(req, res) {
@@ -78,15 +72,7 @@ class ScheduleItem extends BaseRoute {
   }
 
   delete(req, res) {
-    req.checkParams('schedule_item_id', 'A schedule item id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.ScheduleItem.findById(req.params.schedule_item_id)
-    .then((item) => {
-      if (!item) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.delete.not_found', message: 'No schedule_item found for provided id.'})]}));
-      item.destroy();
-      _this.log.info('Deleted schedule item ' + req.params.schedule_item_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, message: 'Schedule item deleted.' }));
-    });
+    Crud.delete({ classname: 'ScheduleItem', db: _this.db, req: req, res: res });
   }
 
   isAuthorized(roles) {

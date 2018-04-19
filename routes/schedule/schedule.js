@@ -2,6 +2,8 @@ import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
 import _ from 'lodash';
+import Crud from '../../lib/crud';
+import Authorized from '../../lib/authorized';
 
 let _this = {};
 
@@ -22,14 +24,7 @@ class Schedule extends BaseRoute {
   }
 
   detail(req, res) {
-    req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Schedule.findById(req.params.schedule_id)
-    .then((schedule) => {
-      if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.detail.not_found', message: 'No schedule found for provided id.'})]}));
-      _this.log.info('Detailing schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: {schedule}}));
-    });
+    Crud.detail({ classname: 'Schedule', db: _this.db, req: req, res: res });
   }
 
   create(req, res) {
@@ -63,15 +58,7 @@ class Schedule extends BaseRoute {
   }
 
   delete(req, res) {
-    req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Schedule.findById(req.params.schedule_id)
-    .then((schedule) => {
-      if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.delete.not_found', message: 'No schedule found for provided id.'})]}));
-      schedule.destroy();
-      _this.log.info('Deleted schedule ' + req.params.schedule_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, message: 'Schedule deleted.' }));
-    });
+    Crud.delete({ classname: 'Schedule', db: _this.db, req: req, res: res });
   }
 
   isAuthorized(roles) {
@@ -81,36 +68,9 @@ class Schedule extends BaseRoute {
         if (result) {
           if (_.intersection(roles, ['super_admin', 'any']).length) {
             _this.log.info('Access granted for user ' + req.user.email);
-            next();
+            return next();
           } else {
-            if (req.params.event_id) {
-              _this.db.Event.findOne({ where: { id: req.params.event_id, owner_user_id: req.user.user_id }}).then((event) => {
-                if (!event) {
-                  _this.log.info('Access denied for user ' + req.user.email);
-                  return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified event.'})]}));
-                } else {
-                  _this.log.info('Access granted for user ' + req.user.email);
-                  return next();
-                }
-              });
-            } else {
-              _this.db.Schedule.findOne({ where: { id: req.params.schedule_id }, include: [{ model: _this.db.Event, where:{ owner_user_id: req.user.user_id }}]}).then((schedule) => {
-                if (schedule) {
-                  schedule.getEvent().then((event) => {
-                    if (event && event.owner_user_id == req.user.user_id) {
-                      _this.log.info('Access granted for user ' + req.user.email);
-                      next();
-                    } else {
-                      _this.log.info('Access granted for user ' + req.user.email);
-                      return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule.'})]}));
-                    }
-                  });
-                } else {
-                  _this.log.info('Access granted for user ' + req.user.email);
-                  return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule.'})]}));
-                }
-              });
-            }
+            return Authorized.isAuthorizedForId({ classname: 'Schedule', checkParentOwner: true, parentClassname: 'Event', db: _this.db, req: req, res: res, next: next });
           }
         } else {
           _this.log.info('Access granted for user ' + req.user.email);

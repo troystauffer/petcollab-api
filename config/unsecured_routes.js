@@ -5,10 +5,10 @@ function unsecuredRoutes(apiPrefix) {
   return [
     { url: apiPrefix + '/auth', methods: ['POST'] },
     { url: apiPrefix + '/auth/facebook', methods: ['POST'] },
-    { url: apiPrefix + '/user/error', methods: ['GET'] },
+    { url: apiPrefix + '/users/error', methods: ['GET'] },
     { url: fieldsRegex, methods: ['GET'] },
-    { url: apiPrefix + '/user', methods: ['POST'] },
-    { url: apiPrefix + '/user/confirm', methods: ['POST'] }
+    { url: apiPrefix + '/users', methods: ['POST'] },
+    { url: apiPrefix + '/users/confirm', methods: ['POST'] }
   ];
 }
 

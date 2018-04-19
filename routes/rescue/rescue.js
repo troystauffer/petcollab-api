@@ -1,6 +1,7 @@
 import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
+import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -11,20 +12,11 @@ class Rescue extends BaseRoute{
   }
 
   list(req, res) {
-    _this.db.Rescue.findAll().then((rescues) => {
-      _this.log.info('Listing rescues for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { rescues }}));
-    });
+    Crud.list({ classname: 'Rescue', db: _this.db, res: res });
   }
 
   detail(req, res) {
-    req.checkParams('rescue_id', 'A rescue id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Rescue.findById(req.params.rescue_id).then((rescue) => {
-      if (!rescue) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'rescue.detail.not_found', message: 'No rescue found for provided id.' })]}));
-      _this.log.info('Detailing rescue ' + req.params.rescue_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { rescue }}));
-    });
+    Crud.detail({ classname: 'Rescue', db: _this.db, req: req, res: res });
   }
 
   create(req, res) {
@@ -60,15 +52,7 @@ class Rescue extends BaseRoute{
   }
 
   delete(req, res) {
-    req.checkParams('rescue_id', 'A rescue id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Rescue.findById(req.params.rescue_id)
-    .then((rescue) => {
-      if (!rescue) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'rescue.delete.not_found', message: 'No rescue found for provided id.' })]}));
-      rescue.destroy();
-      _this.log.info('Deleted rescue ' + req.params.rescue_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, message: 'Rescue deleted.' }));
-    });
+    Crud.delete({ classname: 'Rescue', db: _this.db, req: req, res: res });
   }
 }
 
