@@ -1,9 +1,7 @@
 import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
-import _ from 'lodash';
 import Crud from '../../lib/crud';
-import Authorized from '../../lib/authorized';
 
 let _this = {};
 
@@ -55,25 +53,6 @@ class Schedule extends BaseRoute {
 
   delete(req, res) {
     Crud.delete({ classname: 'Schedule', db: _this.db, req: req, res: res });
-  }
-
-  isAuthorized(roles) {
-    let hasRole = super.hasRole;
-    return function(req, res, next) {
-      hasRole(req.user, roles, function(result) {
-        if (result) {
-          if (_.intersection(roles, ['super_admin', 'any']).length) {
-            _this.log.info('Access granted for user ' + req.user.email);
-            return next();
-          } else {
-            return Authorized.isAuthorizedForId({ classname: 'Schedule', checkParentOwner: true, parentClassname: 'Event', db: _this.db, req: req, res: res, next: next });
-          }
-        } else {
-          _this.log.info('Access granted for user ' + req.user.email);
-          return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule.user.not_authorized', message: 'User is not authorized.'})]}));
-        }
-      });
-    };
   }
 }
 

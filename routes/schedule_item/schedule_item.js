@@ -1,7 +1,6 @@
 import BaseRoute from '../base_route';
 import RO from '../../lib/response_object';
 import ApiError from '../../lib/api_error';
-import _ from 'lodash';
 import Crud from '../../lib/crud';
 
 let _this = {};
@@ -69,47 +68,6 @@ class ScheduleItem extends BaseRoute {
 
   delete(req, res) {
     Crud.delete({ classname: 'ScheduleItem', db: _this.db, req: req, res: res });
-  }
-
-  isAuthorized(roles) {
-    let hasRole = super.hasRole;
-    return function(req, res, next) {
-      hasRole(req.user, roles, function(result) {
-        if (result) {
-          if (_.intersection(roles, ['super_admin', 'any']).length) {
-            _this.log.info('Access granted for user ' + req.user.email);
-            return next();
-          } else {
-            if (req.params.schedule_id) {
-              _this.db.Schedule.findOne({ where: { id: req.params.schedule_id }, include: [{ model: _this.db.Event, where: { owner_user_id: req.user.user_id }}]})
-              .then((schedule) => {
-                if (!schedule) {
-                  _this.log.info('Access denied for user ' + req.user.email);
-                  return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule.'})]}));
-                } else {
-                  _this.log.info('Access granted for user ' + req.user.email);
-                  return next();
-                }
-              });
-            } else if (req.params.schedule_item_id) {
-              _this.db.ScheduleItem.findOne({ where: { id: req.params.schedule_item_id, $or: [{ assigned_user_id: req.user.user_id }, { 'event.owner_user_id': req.user.user_id }]}, include: [{ model: _this.db.Schedule, as: 'schedule', include: [{ model: _this.db.Event, as: 'event' }]}]})
-              .then((item) => {
-                if (item) {
-                  _this.log.info('Access granted for user ' + req.user.email);
-                  return next();
-                } else {
-                  _this.log.info('Access denied for user ' + req.user.email);
-                  return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.user.not_authorized', message: 'User is not authorized to view or modify the specified schedule_item.'})]}));
-                }
-              });
-            }
-          }
-        } else {
-          _this.log.info('Access denied for user ' + req.user.email);
-          return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.user.not_authorized', message: 'User is not authorized.'})]}));
-        }
-      });
-    };
   }
 }
 

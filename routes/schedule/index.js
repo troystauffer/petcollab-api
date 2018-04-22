@@ -1,11 +1,11 @@
 class ScheduleRoutes {
   constructor(router, args) {
     const schedule = new (require('./schedule'))(args);
-    router.post('/events/:event_id/schedules', schedule.isAuthorized(['admin', 'super_admin']), schedule.create);
-    router.get('/events/:event_id/schedules', schedule.isAuthorized(['any']), schedule.list);
-    router.get('/schedules/:schedule_id', schedule.isAuthorized(['any']), schedule.detail);
-    router.post('/schedules/:schedule_id', schedule.isAuthorized(['admin', 'super_admin']), schedule.update);
-    router.delete('/schedules/:schedule_id', schedule.isAuthorized(['admin', 'super_admin']), schedule.delete);
+    router.post('/events/:event_id/schedules', schedule.create);
+    router.get('/events/:event_id/schedules', schedule.list);
+    router.get('/schedules/:schedule_id', schedule.detail);
+    router.post('/schedules/:schedule_id', schedule.update);
+    router.delete('/schedules/:schedule_id', schedule.delete);
   }
 }
 

@@ -97,19 +97,6 @@ class User extends BaseRoute {
       });
     });
   }
-
-  isAuthorized(roles) {
-    let hasRole = super.hasRole;
-    return function(req, res, next) {
-      hasRole(req.user, roles, function(result) {
-        if (result) {
-          next();
-        } else {
-          return res.status(403).json(new RO({ success: false, errors: [new ApiError({ type: 'user.user.not_authorized', message: 'User not authorized.' })]}));
-        }
-      });
-    };
-  }
 }
 
 function validateUser(user, res, err) {
