@@ -22,10 +22,5 @@
     "es6": true,
     "node": true
   },
-  "extends": "eslint:recommended",
-  "ecmaFeatures": {
-    "jsx": true,
-    "experimentalObjectRestSpread": true,
-    "modules": true
-  }
+  "extends": "eslint:recommended"
 }

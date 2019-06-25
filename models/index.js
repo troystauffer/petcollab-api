@@ -19,12 +19,9 @@ function DB(_config, log) {
     log.info('Initialized database from config.');
   }
 
-  fs
-  .readdirSync(__dirname)
-  .filter(function(file) {
+  fs.readdirSync(__dirname).filter(function(file) {
     return (file.indexOf('.') !== 0) && (file !== basename);
-  })
-  .forEach(function(file) {
+  }).forEach(function(file) {
     if (file.slice(-3) !== '.js') return;
     let model = sequelize['import'](path.join(__dirname, file));
     db[model.name] = model;

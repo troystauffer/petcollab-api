@@ -1,6 +1,4 @@
 import BaseRoute from '../base_route';
-import RO from '../../lib/response_object';
-import ApiError from '../../lib/api_error';
 import Crud from '../../lib/crud';
 
 let _this = {};
@@ -49,8 +47,7 @@ class ScheduleItem extends BaseRoute {
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
     req.sanitizeBody('checked_in_at').toDate();
-    _this.db.ScheduleItem.findById(req.params.schedule_item_id)
-    .then((item) => {
+    _this.db.ScheduleItem.findById(req.params.schedule_item_id).then((item) => {
       if (!item) return res.status(404).json({ success: false, errors: [{ type: 'schedule_item.update.not_found', message: 'No schedule_item found for provided id.'}]});
       let updateParams = {};
       if (req.body.assigned_user_id) updateParams['assigned_user_id'] = req.body.assigned_user_id;

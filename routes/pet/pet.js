@@ -1,6 +1,4 @@
 import BaseRoute from '../base_route';
-import RO from '../../lib/response_object';
-import ApiError from '../../lib/api_error';
 import _ from 'lodash';
 import Crud from '../../lib/crud';
 
@@ -16,10 +14,11 @@ class Pet extends BaseRoute{
   }
 
   list(req, res) {
-    _this.db.Pet.findAll({ include: [ _this.db.PetType, _this.db.Transfer ], order: [['created_at', 'DESC']] })
-    .then((pets) => {
+    _this.db.Pet.findAll({
+      include: [ _this.db.PetType, _this.db.Transfer ], order: [['created_at', 'DESC']]
+    }).then((pets) => {
       _this.log.info('Listing all pets for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { pets }}));
+      return res.status(200).json({ success: true, response: { pets }});
     });
   }
 
@@ -36,7 +35,7 @@ class Pet extends BaseRoute{
       comments: req.body.comments
     }).then((pet) => {
       _this.log.info('Created new pet ' + pet.name + ', id: ' + pet.id + ' for user ' + req.user.email);
-      return res.status(201).json(new RO({ success: true, message: 'Pet created successfully.', response: {pet}}));
+      return res.status(201).json({ success: true, message: 'Pet created successfully.', response: {pet}});
     });
   }
 
@@ -44,9 +43,9 @@ class Pet extends BaseRoute{
     req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Pet.findById(req.params.pet_id, { include: [ _this.db.PetType, _this.db.Transfer ]}).then((pet) => {
-      if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.detail.not_found', message: 'No pet found for provided id.' })]}));
+      if (!pet) return res.status(404).json({ success: false, errors: [{ type: 'pet.detail.not_found', message: 'No pet found for provided id.' }]});
       _this.log.info('Detailing pet ' + req.params.pet_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { pet: pet }}));
+      return res.status(200).json({ success: true, response: { pet: pet }});
     });
   }
 
@@ -58,16 +57,15 @@ class Pet extends BaseRoute{
     if (req.body.pet_type) pet_type = _.find(_this.types, ['title', req.body.pet_type]);
     if (req.body.pet_type_id) pet_type = _.find(_this.types, (t) => { return t.id == req.body.pet_type_id; });
     if (typeof pet_type == 'undefined') pet_type = _.find(_this.types, ['title', 'Dog']);
-    _this.db.Pet.findById(req.params.pet_id)
-    .then((pet) => {
-      if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.update.not_found', message: 'No pet found for provided id.' })]}));
+    _this.db.Pet.findById(req.params.pet_id).then((pet) => {
+      if (!pet) return res.status(404).json({ success: false, errors: [{ type: 'pet.update.not_found', message: 'No pet found for provided id.' }]});
       pet.update({
         name: req.body.name,
         pet_type_id: pet_type.id,
         comments: req.body.comments
       }).then((pet) => {
         _this.log.info('Updated pet ' + pet.title + ', id: ' + pet.id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Pet updated successfully.' }));
+        return res.status(201).json({ success: true, message: 'Pet updated successfully.' });
       });
     });
   }
@@ -81,9 +79,9 @@ class Pet extends BaseRoute{
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Pet.findById(req.params.pet_id).then((pet) => {
-      if (!pet) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.transfer.not_found', message: 'No pet found for provided id.' })]}));
+      if (!pet) return res.status(404).json({ success: false, errors: [{ type: 'pet.transfer.not_found', message: 'No pet found for provided id.' }]});
       _this.db.Event.findById(req.params.event_id).then((event) => {
-        if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'pet.transfer.not_found', message: 'No event found for provided id.' })]}));
+        if (!event) return res.status(404).json({ success: false, errors: [{ type: 'pet.transfer.not_found', message: 'No event found for provided id.' }]});
         _this.db.Transfer.findOne({ where: { pet_id: req.params.pet_id }}).then((transfer) => {
           if (transfer) return transfer.destroy();
         }).then(() => {
@@ -91,7 +89,7 @@ class Pet extends BaseRoute{
             pet_id: req.params.pet_id,
             event_id: req.params.event_id
           }).then(() => {
-            return res.status(201).json(new RO({ success: true, message: 'Transfer created.' }));
+            return res.status(201).json({ success: true, message: 'Transfer created.' });
           });
         });
       });
