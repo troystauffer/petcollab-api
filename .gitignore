@@ -4,3 +4,4 @@ petcollab-db.test.sqlite
 npm-debug.log
 seeders/20170421210827-super-admin.js
 migrations/*constraints.js
+config/config.json
