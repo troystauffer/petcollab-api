@@ -3,12 +3,6 @@ const _ = require('lodash');
 
 module.exports = function(){
   let defaults = {
-    facebook: {
-      clientID: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      redirectUri: 'http://localhost:3000/auth/facebook/return',
-      ogurl: 'graph.facebook.com'
-    },
     jws: {
       key: process.env.SESSION_KEY,
       algorithm: 'HS256'
@@ -32,10 +26,10 @@ module.exports = function(){
     return _.assign(defaults, {
       port: process.env.PORT || 3300,
       database: {
-        dialect: 'sqlite',
-        storage: './petcollab-db.development.sqlite',
-        logging: false
-        // logging: console.log
+        dialect: 'postgres',
+        database: 'papi_dev',
+        username: 'petcollab',
+        password: process.env.DATABASE_PASSWORD
       },
       log: {
         name: 'petcollab-api-dev',
@@ -54,10 +48,11 @@ module.exports = function(){
     return _.assign(defaults, {
       port: process.env.PORT || 3000,
       database: {
-        dialect: 'sqlite',
-        storage: './petcollab-db.test.sqlite',
-        logging: false
-      }, 
+        dialect: 'postgres',
+        database: 'papi_test',
+        username: 'petcollab',
+        password: process.env.DATABASE_PASSWORD
+      },
       log: {
         name: 'petcollab-api-test',
         level: 'error',
@@ -84,7 +79,7 @@ module.exports = function(){
           'ssl': true
         },
         logging: false
-      }, 
+      },
       log: {
         name: 'petcollab-api',
         streams: [
@@ -97,12 +92,6 @@ module.exports = function(){
             stream: process.stderr
           }
         ]
-      },
-      facebook: {
-        clientID: process.env.FACEBOOK_CLIENT_ID,
-        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-        redirectUri: 'https://petcollab.herokuapp.com/auth/facebook/return',
-        ogurl: 'graph.facebook.com'
       },
       easyPbkdf2: {
         DEFAULT_HASH_ITERATIONS: 10000,

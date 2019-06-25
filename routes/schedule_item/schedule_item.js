@@ -28,7 +28,7 @@ class ScheduleItem extends BaseRoute {
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
     _this.db.Schedule.findById(req.params.schedule_id).then((schedule) => {
-      if (!schedule) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.create.not_found', message: 'No schedule found for provided id.'})]}));
+      if (!schedule) return res.status(404).json({ success: false, errors: [{ type: 'schedule_item.create.not_found', message: 'No schedule found for provided id.'}]});
       _this.db.ScheduleItem.create({
         schedule_id: schedule.id,
         assigned_user_id: req.body.assigned_user_id || null,
@@ -38,7 +38,7 @@ class ScheduleItem extends BaseRoute {
         order: req.body.order || null
       }).then((schedule_item) => {
         _this.log.info('Created schedule item ' + schedule_item.id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Schedule item created successfully.', response: { schedule_item }}));
+        return res.status(201).json({ success: true, message: 'Schedule item created successfully.', response: { schedule_item }});
       });
     });
   }
@@ -51,7 +51,7 @@ class ScheduleItem extends BaseRoute {
     req.sanitizeBody('checked_in_at').toDate();
     _this.db.ScheduleItem.findById(req.params.schedule_item_id)
     .then((item) => {
-      if (!item) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'schedule_item.update.not_found', message: 'No schedule_item found for provided id.'})]}));
+      if (!item) return res.status(404).json({ success: false, errors: [{ type: 'schedule_item.update.not_found', message: 'No schedule_item found for provided id.'}]});
       let updateParams = {};
       if (req.body.assigned_user_id) updateParams['assigned_user_id'] = req.body.assigned_user_id;
       if (req.body.title) updateParams['title'] = req.body.title;
@@ -61,7 +61,7 @@ class ScheduleItem extends BaseRoute {
       if (req.body.checked_in_at) updateParams['checked_in_at'] = req.body.checked_in_at;
       item.update(updateParams).then((item) => {
         _this.log.info('Updated schedule item ' + item.id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Schedule item updated successfully.' }));
+        return res.status(201).json({ success: true, message: 'Schedule item updated successfully.' });
       });
     });
   }

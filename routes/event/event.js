@@ -1,6 +1,4 @@
 import BaseRoute from '../base_route';
-import RO from '../../lib/response_object';
-import ApiError from '../../lib/api_error';
 import Crud from '../../lib/crud';
 
 let _this = {};
@@ -16,7 +14,7 @@ class Event extends BaseRoute{
     _this.db.Event.findAll({ order: [['starts_at', 'DESC']], include: [_this.db.User]})
     .then((events) => {
       _this.log.info('Listing all events for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { events }}));
+      return res.status(200).json({ success: true, response: { events }});
     });
   }
 
@@ -25,9 +23,9 @@ class Event extends BaseRoute{
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Event.findById(req.params.event_id, { include: [{ model: _this.db.Transfer, include: [_this.db.Pet]}, { model: _this.db.Rescue, as:'ReleasingRescue' }, { model: _this.db.Rescue, as:'ReceivingRescue' }, _this.db.User]})
     .then((event) => {
-      if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.detail.not_found', message: 'No event found for provided id.' })]}));
+      if (!event) return res.status(404).json({ success: false, errors: [{ type: 'event.detail.not_found', message: 'No event found for provided id.' }]});
       _this.log.info('Detailing event ' + req.params.event_id + ' for user ' + req.user.email);
-      return res.status(200).json(new RO({ success: true, response: { event }}));
+      return res.status(200).json({ success: true, response: { event }});
     });
   }
 
@@ -41,8 +39,8 @@ class Event extends BaseRoute{
     req.sanitizeBody('owner_user_id').toInt();
     req.sanitizeBody('releasing_rescue_id').toInt();
     req.sanitizeBody('receiving_rescue_id').toInt();
-    if (!req.body.starts_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.create.starts_at.invalid', message: 'Invalid start date.' })]}));
-    if (!req.body.ends_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.create.ends_at.invalid', message: 'Invalid end date.' })]}));
+    if (!req.body.starts_at) return res.status(400).json({ success: false, errors: [{ type: 'event.create.starts_at.invalid', message: 'Invalid start date.' }]});
+    if (!req.body.ends_at) return res.status(400).json({ success: false, errors: [{ type: 'event.create.ends_at.invalid', message: 'Invalid end date.' }]});
     if (!req.body.owner_user_id) req.body.owner_user_id = req.user.user_id;
     let eventParams = {
       title: req.body.title,
@@ -54,7 +52,7 @@ class Event extends BaseRoute{
     if (req.body.receiving_rescue_id) eventParams['receiving_rescue_id'] = req.body.receiving_rescue_id;
     _this.db.Event.create(eventParams).then((event) => {
       _this.log.info('Created new event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
-      return res.status(201).json(new RO({ success: true, message: 'Event created successfully.', response: { event }}));
+      return res.status(201).json({ success: true, message: 'Event created successfully.', response: { event }});
     });
   }
 
@@ -68,11 +66,11 @@ class Event extends BaseRoute{
     req.sanitizeBody('ends_at').toDate();
     req.sanitizeBody('releasing_rescue_id').toInt();
     req.sanitizeBody('receiving_rescue_id').toInt();
-    if (!req.body.starts_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.update.starts_at.invalid', message: 'Invalid start date.' })]}));
-    if (!req.body.ends_at) return res.status(400).json(new RO({ success: false, errors: [new ApiError({ type: 'event.update.ends_at.invalid', message: 'Invalid end date.' })]}));
+    if (!req.body.starts_at) return res.status(400).json({ success: false, errors: [{ type: 'event.update.starts_at.invalid', message: 'Invalid start date.' }]});
+    if (!req.body.ends_at) return res.status(400).json({ success: false, errors: [{ type: 'event.update.ends_at.invalid', message: 'Invalid end date.' }]});
     _this.db.Event.findById(req.params.event_id)
     .then((event) => {
-      if (!event) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'event.update.not_found', message: 'No event found for provided id.' })]}));
+      if (!event) return res.status(404).json({ success: false, errors: [{ type: 'event.update.not_found', message: 'No event found for provided id.' }]});
       if (!req.body.releasing_rescue_id) req.body.releasing_rescue_id = event.releasing_rescue_id;
       if (!req.body.receiving_rescue_id) req.body.receiving_rescue_id = event.receiving_rescue_id;
       event.update({
@@ -83,7 +81,7 @@ class Event extends BaseRoute{
         receiving_rescue_id: req.body.receiving_rescue_id
       }).then((event) => {
         _this.log.info('Updated event ' + event.title + ', id: ' + event.id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Event updated successfully.' }));
+        return res.status(201).json({ success: true, message: 'Event updated successfully.' });
       });
     });
   }

@@ -1,6 +1,4 @@
 import BaseRoute from '../base_route';
-import RO from '../../lib/response_object';
-import ApiError from '../../lib/api_error';
 
 let _this = {};
 
@@ -15,22 +13,18 @@ class User extends BaseRoute {
     });
   }
 
-  createAdmin(req, res) {
-    return _this.create(req, res, _this.adminRole);
-  }
-
   createUser(req, res) {
     return _this.create(req, res, _this.userRole);
   }
 
   info(req, res) {
     _this.db.User.findById(req.user.user_id).then((user) => {
-      return res.status(200).json(new RO({success: true, response: { user }}));
+      return res.status(200).json({success: true, response: { user }});
     });
   }
 
   error(req, res) {
-    return res.status(400).json(new RO({success: false, errors: [new ApiError({ type: 'user.error', message: 'An error occurred.' })]}));
+    return res.status(400).json({success: false, errors: [{ type: 'user.error', message: 'An error occurred.' }]});
   }
 
   confirm(req, res) {
@@ -45,13 +39,13 @@ class User extends BaseRoute {
         user.save()
         .then(function(user) {
           if (user) {
-            return res.status(200).json(new RO({success: true, message: 'Confirmation successful.' }));
+            return res.status(200).json({success: true, message: 'Confirmation successful.' });
           } else {
-            return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.confirm.token_error', message: 'An error occurred redeeming the token.' })]}));
+            return res.status(500).json({success: false, errors: [{ type: 'user.confirm.token_error', message: 'An error occurred redeeming the token.' }]});
           }
         });
       } else {
-        return res.status(400).json(new RO({success: false, errors: [new ApiError({ type: 'user.confirm.params.invalid', message: 'Email or token are invalid.' })]}));
+        return res.status(400).json({success: false, errors: [{ type: 'user.confirm.params.invalid', message: 'Email or token are invalid.' }]});
       }
     });
   }
@@ -63,10 +57,10 @@ class User extends BaseRoute {
     req.checkBody('name', 'A valid name is required.').notEmpty();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.pwcrypt.secureHash(req.body.password, (err, passwordHash, salt) => {
-      if (err) return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.create.unspecified', message: 'An error occurred. See validations for details.', validations: err })]}));
+      if (err) return res.status(500).json({success: false, errors: [{ type: 'user.create.unspecified', message: 'An error occurred. See validations for details.', validations: err }]});
       _this.db.User.findOrCreate({ where: { email: req.body.email }})
       .spread(function(user, created) {
-        if (!created) return res.status(400).json(new RO({success: false, errors: [new ApiError({ type: 'user.create.email.exists', message: 'User with this email already exists.'})]}));
+        if (!created) return res.status(400).json({success: false, errors: [{ type: 'user.create.email.exists', message: 'User with this email already exists.'}]});
         user.password_hash = passwordHash;
         user.salt = salt;
         user.name = req.body.name;
@@ -87,7 +81,7 @@ class User extends BaseRoute {
     _this.db.User.findById(req.user.user_id).then((user) => {
       if (req.body.name) user.name = req.body.name;
       _this.pwcrypt.secureHash(req.body.password || '', (err, passwordHash, salt) => {
-        if (err) return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.update.unspecified', message: 'An error occurred. See validations for details.', validations: err })]}));
+        if (err) return res.status(500).json({success: false, errors: [{ type: 'user.update.unspecified', message: 'An error occurred. See validations for details.', validations: err }]});
         if (passwordHash !== '') user.password_hash = passwordHash;
         if (salt !== '') user.salt = salt;
         user.save()
@@ -101,9 +95,9 @@ class User extends BaseRoute {
 
 function validateUser(user, res, err) {
   if (user) {
-    return res.status(201).json(new RO({success: true, message: 'Account updated successfully.' }));
+    return res.status(201).json({success: true, message: 'Account updated successfully.' });
   } else {
-    return res.status(500).json(new RO({success: false, errors: [new ApiError({ type: 'user.create.unspecified', message: 'An error occurred creating the account. See validations for details.', validations: err })]}));
+    return res.status(500).json({success: false, errors: [{ type: 'user.create.unspecified', message: 'An error occurred creating the account. See validations for details.', validations: err }]});
   }
 }
 

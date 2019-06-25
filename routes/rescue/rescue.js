@@ -1,6 +1,4 @@
 import BaseRoute from '../base_route';
-import RO from '../../lib/response_object';
-import ApiError from '../../lib/api_error';
 import Crud from '../../lib/crud';
 
 let _this = {};
@@ -28,7 +26,7 @@ class Rescue extends BaseRoute{
       zip_code: req.body.zip_code
     }).then((rescue) => {
       _this.log.info('Created new rescue ' + rescue.name + ', id: ' + rescue.id + ' for user ' + req.user.email);
-      return res.status(201).json(new RO({ success: true, message: 'Rescue created successfully.', response: {rescue}}));
+      return res.status(201).json({ success: true, message: 'Rescue created successfully.', response: {rescue}});
     });
   }
 
@@ -37,7 +35,7 @@ class Rescue extends BaseRoute{
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Rescue.findById(req.params.rescue_id)
     .then((rescue) => {
-      if (!rescue) return res.status(404).json(new RO({ success: false, errors: [new ApiError({ type: 'rescue.update.not_found', message: 'No event found for provided id.' })]}));
+      if (!rescue) return res.status(404).json({ success: false, errors: [{ type: 'rescue.update.not_found', message: 'No event found for provided id.' }]});
       rescue.update({
         name: req.body.name,
         street_address: req.body.street_address,
@@ -46,7 +44,7 @@ class Rescue extends BaseRoute{
         zip_code: req.body.zip_code
       }).then((rescue) => {
         _this.log.info('Updated rescue ' + rescue.name + ', id: ' + rescue.id + ' for user ' + req.user.email);
-        return res.status(201).json(new RO({ success: true, message: 'Rescue updated successfully.' }));
+        return res.status(201).json({ success: true, message: 'Rescue updated successfully.' });
       });
     });
   }

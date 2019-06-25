@@ -14,8 +14,8 @@ import Encryption from '../util/encryption';
 describe('Auth', () => {
   let res, req, authRoutes, pwcrypt, pwcryptError, pwcryptInvalid, https, jws = {};
   let encryption = new Encryption();
-  const config = { 'facebook': { 'ogurl': '', 'clientID': '', 'clientSecret': '', 'redirectUri': '' }, jws: { algorithm: 'fake' }};
-  
+  const config = { jws: { algorithm: 'fake' }};
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -80,23 +80,6 @@ describe('Auth', () => {
       };
       validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "encrypted"} }, 200, authRoutes.authenticate);
       expect(pwcrypt.calls.verify).toEqual(1);
-      expect(jws.calls.sign).toEqual(1);
-    });
-  });
-  describe('facebook authentication', () => {
-    it('should fail without a facebook auth code', () => {
-      let validationErrors = [{"param":"code","msg":"A facebook auth code is required."}];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
-      req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.facebook);
-      expect(https.calls.request).toEqual(0);
-      expect(jws.calls.sign).toEqual(0);
-    });
-
-    it('should authenticate successfully', () => {
-      req.body = { code: 'facebookcode' };
-      validate(req, res, { success: true, message: 'Authenticated successfully.', response: {token: 'encrypted'} }, 200, authRoutes.facebook);
-      expect(https.calls.request).toEqual(2);
       expect(jws.calls.sign).toEqual(1);
     });
   });
