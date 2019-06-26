@@ -25,7 +25,7 @@ class ScheduleItem extends BaseRoute {
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
-    _this.db.Schedule.findById(req.params.schedule_id).then((schedule) => {
+    _this.db.Schedule.findByPk(req.params.schedule_id).then((schedule) => {
       if (!schedule) return res.status(404).json({ success: false, errors: [{ type: 'schedule_item.create.not_found', message: 'No schedule found for provided id.'}]});
       _this.db.ScheduleItem.create({
         schedule_id: schedule.id,
@@ -47,7 +47,7 @@ class ScheduleItem extends BaseRoute {
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
     req.sanitizeBody('checked_in_at').toDate();
-    _this.db.ScheduleItem.findById(req.params.schedule_item_id).then((item) => {
+    _this.db.ScheduleItem.findByPk(req.params.schedule_item_id).then((item) => {
       if (!item) return res.status(404).json({ success: false, errors: [{ type: 'schedule_item.update.not_found', message: 'No schedule_item found for provided id.'}]});
       let updateParams = {};
       if (req.body.assigned_user_id) updateParams['assigned_user_id'] = req.body.assigned_user_id;

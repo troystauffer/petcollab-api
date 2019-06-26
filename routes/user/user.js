@@ -10,22 +10,15 @@ class User extends BaseRoute {
     _this.db.Role.findOne({ where: { title: 'user' }}).then((role) => {
       _this.userRole = role;
     });
-    _this.db.Role.findOne({ where: { title: 'super_admin' }}).then((superAdminRole) => {
-      _this.superAdminRole = superAdminRole;
-    });
   }
 
   createUser(req, res) {
     return _this.create(req, res, _this.userRole);
   }
 
-  createAdminUser(req, res) {
-    return _this.create(req, res, _this.superAdminRole);
-  }
-
   info(req, res) {
-    _this.db.User.findById(req.user.user_id).then((user) => {
-      return res.status(200).json({success: true, response: { user }});
+    _this.db.User.findByPk(req.user.user_id).then((user) => {
+      return res.status(200).json({ success: true, response: { user }});
     });
   }
 
@@ -83,7 +76,7 @@ class User extends BaseRoute {
   }
 
   update(req, res) {
-    _this.db.User.findById(req.user.user_id).then((user) => {
+    _this.db.User.findByPk(req.user.user_id).then((user) => {
       if (req.body.name) user.name = req.body.name;
       _this.pwcrypt.secureHash(req.body.password || '', (err, passwordHash, salt) => {
         if (err) return res.status(500).json({success: false, errors: [{ type: 'user.update.unspecified', message: 'An error occurred. See validations for details.', validations: err }]});

@@ -1,22 +1,24 @@
-'use strict';
-module.exports = function(sequelize, DataTypes) {
-  var PetType = sequelize.define('PetType', {
-    title: { type: DataTypes.STRING, allowNull: false, validate: { notEmpty: true, isAlphanumeric: true }}
-  }, {
-    underscored: true,
-    classMethods: {
-      associate: function(models) {
-        PetType.hasMany(models.Pet, { foreignKey: 'pet_type_id' });
-      }
-    },
-    instanceMethods: {
-      toJSON: function() {
-        return {
-          id: this.id,
-          title: this.title
-        };
-      }
-    }
-  });
-  return PetType;
-};
+const Sequelize = require('sequelize');
+const Model = Sequelize.Model;
+
+module.exports = class PetType extends Model {
+  static init(sequelize) {
+    return super.init({
+      title: { type: Sequelize.STRING, allowNull: false, validate: { notEmpty: true, isAlphanumeric: true }}
+    }, {
+      underscored: true,
+      sequelize
+    });
+  }
+
+  static associate(models) {
+    this.hasMany(models.Pet, { foreignKey: 'pet_type_id' });
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      title: this.title
+    };
+  }
+}

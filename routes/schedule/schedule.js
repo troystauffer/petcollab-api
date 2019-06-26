@@ -23,7 +23,7 @@ class Schedule extends BaseRoute {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     req.checkBody('title', 'Title is required.').notEmpty();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Event.findById(req.params.event_id).then((event) => {
+    _this.db.Event.findByPk(req.params.event_id).then((event) => {
       if (!event) return res.status(404).json({ success: false, errors: [{ type: 'schedule.create.not_found', message: 'No event found for provided id.'}]});
       _this.db.Schedule.create({
         event_id: event.id,
@@ -39,7 +39,7 @@ class Schedule extends BaseRoute {
     req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
     req.checkBody('title', 'Title is required.').notEmpty();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Schedule.findById(req.params.schedule_id).then((schedule) => {
+    _this.db.Schedule.findByPk(req.params.schedule_id).then((schedule) => {
       if (!schedule) return res.status(404).json({ success: false, errors: [{ type: 'schedule.update.not_found', message: 'No schedule found for provided id.'}]});
       schedule.update({ title: req.body.title }).then(() => {
         _this.log.info('Updated schedule ' + req.params.schedule_id + ' for user ' + req.user.email);

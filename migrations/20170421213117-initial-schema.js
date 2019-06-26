@@ -13,7 +13,6 @@ module.exports = {
       email: { type: Sequelize.STRING },
       password_hash: { type: Sequelize.TEXT },
       salt: { type: Sequelize.STRING },
-      facebook_id: { type: Sequelize.STRING },
       role_id: { type: Sequelize.INTEGER },
       confirmed: {
         type: Sequelize.DATE,

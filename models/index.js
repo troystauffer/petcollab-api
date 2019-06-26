@@ -23,8 +23,9 @@ function DB(_config, log) {
     return (file.indexOf('.') !== 0) && (file !== basename);
   }).forEach(function(file) {
     if (file.slice(-3) !== '.js') return;
-    let model = sequelize['import'](path.join(__dirname, file));
-    db[model.name] = model;
+    let model = require(path.join(__dirname, file));
+    log.info('Attempting to initialize model ' + model.name + '...');
+    db[model.name] = model.init(sequelize);
     log.info('Initialized model ' + model.name);
   });
 

@@ -20,7 +20,7 @@ class Event extends BaseRoute{
   detail(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    _this.db.Event.findById(req.params.event_id, { include: [
+    _this.db.Event.findByPk(req.params.event_id, { include: [
       { model: _this.db.Transfer, include: [_this.db.Pet]},
       { model: _this.db.Rescue, as:'ReleasingRescue' },
       { model: _this.db.Rescue, as:'ReceivingRescue' },
@@ -81,7 +81,7 @@ class Event extends BaseRoute{
     if (!req.body.ends_at) return res.status(400).json({ success: false, errors: [
       { type: 'event.update.ends_at.invalid', message: 'Invalid end date.' }
     ]});
-    _this.db.Event.findById(req.params.event_id).then((event) => {
+    _this.db.Event.findByPk(req.params.event_id).then((event) => {
       if (!event) return res.status(404).json({ success: false, errors: [
         { type: 'event.update.not_found', message: 'No event found for provided id.' }
       ]});
