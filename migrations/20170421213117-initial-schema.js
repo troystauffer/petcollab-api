@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-    return queryInterface.createTable('Users', {
+    return queryInterface.createTable('users', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -25,8 +25,8 @@ module.exports = {
         allowNull: true,
         defaultValue: null
       },
-      created_at: { 
-        allowNull: false, 
+      created_at: {
+        allowNull: false,
         type: Sequelize.DATE
       },
       updated_at: {
@@ -34,7 +34,7 @@ module.exports = {
         type: Sequelize.DATE
       }
     }).then(function() {
-      queryInterface.createTable('Roles', {
+      queryInterface.createTable('roles', {
         id: {
           allowNull: false,
           autoIncrement: true,
@@ -53,7 +53,7 @@ module.exports = {
           type: Sequelize.DATE
         }
       }).then(function() {
-        queryInterface.createTable('Events', {
+        queryInterface.createTable('events', {
           id: {
             allowNull: false,
             autoIncrement: true,
@@ -73,7 +73,7 @@ module.exports = {
             type: Sequelize.DATE
           }
         }).then(function() {
-          queryInterface.createTable('Schedules', {
+          queryInterface.createTable('schedules', {
             id: {
               allowNull: false,
               autoIncrement: true,
@@ -91,7 +91,7 @@ module.exports = {
               type: Sequelize.DATE
             }
           }).then(function() {
-            queryInterface.createTable('ScheduleItems', {
+            queryInterface.createTable('schedule_items', {
               id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -120,11 +120,11 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('ScheduleItems').then(function() {
-      queryInterface.dropTable('Schedules').then(function() {
-        queryInterface.dropTable('Events').then(function() {
-          queryInterface.dropTable('Roles').then(function() {
-            queryInterface.dropTable('Users');
+    return queryInterface.dropTable('schedule_items').then(function() {
+      queryInterface.dropTable('schedules').then(function() {
+        queryInterface.dropTable('events').then(function() {
+          queryInterface.dropTable('roles').then(function() {
+            queryInterface.dropTable('users');
           });
         });
       });

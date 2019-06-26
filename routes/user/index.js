@@ -4,6 +4,7 @@ class UserRoutes {
     router.get('/users/info.:format?', user.info);
     router.get('/users/error.:format?', user.error);
     router.post('/users.:format?', user.createUser);
+    router.post('/users/create/admin.:format?', user.createAdminUser);
     router.post('/users/confirm.:format?', user.confirm);
     router.patch('/users.:format?', user.update);
   }

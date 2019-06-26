@@ -3,7 +3,7 @@
 module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.addColumn(
-      'ScheduleItems',
+      'schedule_items',
       'checked_in_at',
       {
         allowNull: true,
@@ -13,6 +13,6 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.removeColumn('ScheduleItems', 'checked_in_at');
+    return queryInterface.removeColumn('schedule_items', 'checked_in_at');
   }
 };

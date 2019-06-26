@@ -9,6 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     receiving_rescue_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Rescues', key: 'id' }, validate: { notEmpty: false }}
   }, {
     underscored: true,
+    freezeTableName: true,
     classMethods: {
       associate: function(models) {
         Event.hasMany(models.Schedule, { foreignKey: 'event_id' });

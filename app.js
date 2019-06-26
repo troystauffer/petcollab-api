@@ -23,7 +23,7 @@ const db = new (require(path.join(__dirname, 'models/')))(config.database, log);
 // security
 const EasyPbkdf2 = require('easy-pbkdf2');
 const pwcrypt = EasyPbkdf2(config.easyPbkdf2);
-const UserToken = new (require(path.join(__dirname, 'lib/user_token')))(db);
+const UserToken = new (require(path.join(__dirname, 'lib/user_token')))(db, log);
 const encryption = new (require(path.join(__dirname, 'lib/encryption')))({ config: config.encryption });
 // custom middleware
 const authenticated = require(path.join(__dirname, 'lib/authenticated'))(jws, config.jws, encryption, log);
@@ -47,7 +47,6 @@ function App() {
   new (require(path.join(__dirname, 'routes/schedule_item')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/pet')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/rescue')))(router, { 'db': db, 'log': log });
-  new (require(path.join(__dirname, 'routes/fields')))(router, { 'db': db, 'log': log });
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');

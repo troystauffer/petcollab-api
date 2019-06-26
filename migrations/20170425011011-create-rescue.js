@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: function(queryInterface, Sequelize) {
-    return queryInterface.createTable('Rescues', {
+    return queryInterface.createTable('rescues', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -22,16 +22,16 @@ module.exports = {
         type: Sequelize.DATE
       }
     }).then(() => {
-      return queryInterface.addColumn('Events', 'releasing_rescue_id', Sequelize.INTEGER);
+      return queryInterface.addColumn('events', 'releasing_rescue_id', Sequelize.INTEGER);
     }).then(() => {
-      return queryInterface.addColumn('Events', 'receiving_rescue_id', Sequelize.INTEGER);
+      return queryInterface.addColumn('events', 'receiving_rescue_id', Sequelize.INTEGER);
     });
   },
   down: function(queryInterface, Sequelize) {
-    return queryInterface.dropTable('Rescues').then(() => {
-      return queryInterface.removeColumn('Events', 'releasing_rescue_id');
+    return queryInterface.dropTable('rescues').then(() => {
+      return queryInterface.removeColumn('events', 'releasing_rescue_id');
     }).then(() => {
-      return queryInterface.removeColumn('Events', 'receiving_rescue_id');
+      return queryInterface.removeColumn('events', 'receiving_rescue_id');
     });
   }
 };

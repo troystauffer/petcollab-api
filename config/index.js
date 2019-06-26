@@ -26,10 +26,11 @@ module.exports = function(){
     return _.assign(defaults, {
       port: process.env.PORT || 3300,
       database: {
-        dialect: 'postgres',
+        dialect: 'mysql',
         database: 'papi_dev',
-        username: 'petcollab',
-        password: process.env.DATABASE_PASSWORD
+        username: process.env.PAPI_DATABASE_USERNAME,
+        password: process.env.PAPI_DATABASE_PASSWORD,
+        host: '127.0.0.1'
       },
       log: {
         name: 'petcollab-api-dev',
@@ -48,10 +49,11 @@ module.exports = function(){
     return _.assign(defaults, {
       port: process.env.PORT || 3000,
       database: {
-        dialect: 'postgres',
+        dialect: 'mysql',
         database: 'papi_test',
-        username: 'petcollab',
-        password: process.env.DATABASE_PASSWORD
+        username: process.env.PAPI_DATABASE_USERNAME,
+        password: process.env.PAPI_DATABASE_PASSWORD,
+        host: '127.0.0.1'
       },
       log: {
         name: 'petcollab-api-test',

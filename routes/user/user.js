@@ -10,10 +10,17 @@ class User extends BaseRoute {
     _this.db.Role.findOne({ where: { title: 'user' }}).then((role) => {
       _this.userRole = role;
     });
+    _this.db.Role.findOne({ where: { title: 'super_admin' }}).then((superAdminRole) => {
+      _this.superAdminRole = superAdminRole;
+    });
   }
 
   createUser(req, res) {
     return _this.create(req, res, _this.userRole);
+  }
+
+  createAdminUser(req, res) {
+    return _this.create(req, res, _this.superAdminRole);
   }
 
   info(req, res) {
@@ -54,16 +61,19 @@ class User extends BaseRoute {
     req.checkBody('name', 'A valid name is required.').notEmpty();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.pwcrypt.secureHash(req.body.password, (err, passwordHash, salt) => {
+      _this.log.info('secureHash');
       if (err) return res.status(500).json({success: false, errors: [{ type: 'user.create.unspecified', message: 'An error occurred. See validations for details.', validations: err }]});
       _this.db.User.findOrCreate({ where: { email: req.body.email }}).spread(function(user, created) {
+        _this.log.info('user find or create');
         if (!created) return res.status(400).json({success: false, errors: [{ type: 'user.create.email.exists', message: 'User with this email already exists.'}]});
+        _this.log.info('created');
         user.password_hash = passwordHash;
         user.salt = salt;
         user.name = req.body.name;
         _this.UserToken.generateToken(_this.config.confirmationTokenLength, function(token) {
           _this.log.info('Confirmation token generated for user ' + user.email + ': ' + token);
           user.confirmation_token = token;
-          user.setRole(role);
+          user.role = role;
           user.save().then(function(user) {
             return validateUser(user, res, err);
           });
