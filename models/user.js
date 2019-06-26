@@ -33,10 +33,7 @@ module.exports = class User extends Model {
       name: this.name,
       email: this.email,
       confirmed: this.confirmed,
-      role_id: this.role_id,
-      role: this.Role,
-      schedule_items: this.ScheduleItems,
-      events: this.Events
+      role_id: this.role_id
     };
   }
 };
