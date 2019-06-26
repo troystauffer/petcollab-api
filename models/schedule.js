@@ -26,4 +26,4 @@ module.exports = class Schedule extends Model {
       schedule_items: this.ScheduleItems
     };
   }
-}
+};

@@ -9,7 +9,7 @@ describe('Pet', () => {
   let res = {};
   let req = {};
   let petRoutes = {};
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -19,7 +19,7 @@ describe('Pet', () => {
   describe('listing', () => {
     it('should return a list of pets', () => {
       let pets = [
-        { id: 1, 'name': 'Test Pet', pet_type_id: 1, comments: 'Good dog.', PetType: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }] }
+        { id: 1, 'name': 'Test Pet', pet_type_id: 1, comments: 'Good dog.', pet_type: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }] }
       ];
       validate(req, res, { success: true, response: { pets }}, 200, petRoutes.list);
     });
@@ -38,11 +38,11 @@ describe('Pet', () => {
       let pet = {
         id: 1,
         name: 'Test Pet',
-        pet_type_id: 1, 
+        pet_type_id: 1,
         comments: 'Good dog.'
       };
       req.body = pet;
-      validate(req, res, { success: true, message: 'Pet created successfully.', response: { pet: { id: 1, name: 'Test Pet', pet_type_id: 1, comments: 'Good dog.', PetType: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }]}}}, 201, petRoutes.create);
+      validate(req, res, { success: true, message: 'Pet created successfully.', response: { pet: { id: 1, name: 'Test Pet', pet_type_id: 1, comments: 'Good dog.', pet_type: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }]}}}, 201, petRoutes.create);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
     });
@@ -68,7 +68,7 @@ describe('Pet', () => {
     });
     it('should display the details of an pet', () => {
       req.params = { id: 1 };
-      validate(req, res, { success: true, response: { pet: { id: 1, name: 'Test Pet', pet_type_id: 1, comments: 'Good dog.', PetType: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }]}}}, 200, petRoutes.detail);
+      validate(req, res, { success: true, response: { pet: { id: 1, name: 'Test Pet', pet_type_id: 1, comments: 'Good dog.', pet_type: { id: 1, title: 'Dog' }, Transfers: [{ id: 1, pet_id: 1, event_id: 1 }]}}}, 200, petRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -78,6 +78,7 @@ describe('Pet', () => {
   describe('editing', () => {
     it('should fail with an invalid id', () => {
       req.params = { id: 'asdf' };
+      req.body = {};
       let validationErrors = [{ "param": "id", "msg": "A pet id is required." }];
       let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
@@ -87,12 +88,13 @@ describe('Pet', () => {
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isNumeric).toEqual(1);
     });
-    it('should fail without an pet title', () => {
+    it('should fail without a pet name', () => {
+      req.params = { pet_id: 1 };
       req.body = {
         start_at: '2017-04-15 12:00:00 GMT',
         ends_at: '2017-04-16 12:00:00 GMT'
       };
-      let validationErrors = [{ "param": "title", "msg": "Title is required." }];
+      let validationErrors = [{ "param": "name", "msg": "Name is required." }];
       let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
       validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, petRoutes.update);

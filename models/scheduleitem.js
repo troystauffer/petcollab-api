@@ -36,4 +36,4 @@ module.exports = class ScheduleItem extends Model {
       checked_in_at: this.checked_in_at
     };
   }
-}
+};

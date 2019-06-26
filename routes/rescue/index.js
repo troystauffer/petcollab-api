@@ -4,7 +4,7 @@ class RescueRoutes {
     router.get('/rescues', rescue.list);
     router.get('/rescues/:rescue_id', rescue.detail);
     router.post('/rescues', rescue.create);
-    router.post('/rescues/:rescue_id', rescue.update);
+    router.patch('/rescues/:rescue_id', rescue.update);
     router.delete('/rescues/:rescue_id', rescue.delete);
   }
 }

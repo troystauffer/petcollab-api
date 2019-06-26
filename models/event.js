@@ -12,23 +12,22 @@ module.exports = class Event extends Model {
       receiving_rescue_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Rescues', key: 'id' }, validate: { notEmpty: false }}
     }, {
       underscored: true,
-      freezeTableName: true,
       sequelize
     });
   }
 
   static associate(models) {
     this.hasMany(models.Schedule, { foreignKey: 'event_id' });
-      this.belongsTo(models.User, { foreignKey: 'owner_user_id' });
-      this.belongsTo(models.Rescue, {
-        foreignKey: 'releasing_rescue_id',
-        as: 'ReleasingRescue'
-      });
-      this.belongsTo(models.Rescue, {
-        foreignKey: 'receiving_rescue_id',
-        as: 'ReceivingRescue'
-      });
-      this.hasMany(models.Transfer, { foreignKey: 'event_id' });
+    this.belongsTo(models.User, { foreignKey: 'owner_user_id' });
+    this.belongsTo(models.Rescue, {
+      foreignKey: 'releasing_rescue_id',
+      as: 'ReleasingRescue'
+    });
+    this.belongsTo(models.Rescue, {
+      foreignKey: 'receiving_rescue_id',
+      as: 'ReceivingRescue'
+    });
+    this.hasMany(models.Transfer, { foreignKey: 'event_id' });
   }
 
   toJSON() {
@@ -46,4 +45,4 @@ module.exports = class Event extends Model {
       transfers: this.Transfers
     };
   }
-}
+};

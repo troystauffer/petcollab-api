@@ -21,4 +21,4 @@ module.exports = class PetType extends Model {
       title: this.title
     };
   }
-}
+};

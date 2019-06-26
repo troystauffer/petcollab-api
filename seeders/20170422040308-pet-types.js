@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-    return queryInterface.bulkInsert('PetTypes', [
+    return queryInterface.bulkInsert('pet_types', [
       {
         title: 'Dog',
         created_at: new Date(),
@@ -17,6 +17,6 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.bulkDelete('PetTypes', null, {});
+    return queryInterface.bulkDelete('pet_types', null, {});
   }
 };

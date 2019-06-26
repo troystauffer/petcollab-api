@@ -27,14 +27,14 @@ module.exports = {
     }
   },
   Event: {
-    findById: function() {
+    findByPk: function() {
       return {
         then: function(fn) { fn(null) }
       }
     }
   },
   Rescue: {
-    findById: function() {
+    findByPk: function() {
       return {
         then: function(fn) { fn(null) }
       }
@@ -46,7 +46,7 @@ module.exports = {
         then: function(fn) { fn([]) }
       }
     },
-    findById: function() {
+    findByPk: function() {
       return {
         then: function(fn) { fn(null) }
       }
@@ -58,7 +58,7 @@ module.exports = {
         then: function(fn) { fn([]) }
       }
     },
-    findById: function() {
+    findByPk: function() {
       return {
         then: function(fn) { fn(null) }
       }
@@ -70,7 +70,7 @@ module.exports = {
         then: function(fn) { fn([]) }
       }
     },
-    findById: function() {
+    findByPk: function() {
       return {
         then: function(fn) { fn(null) }
       }

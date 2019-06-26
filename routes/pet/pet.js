@@ -28,7 +28,7 @@ class Pet extends BaseRoute{
     let pet_type = {};
     if (req.body.pet_type) pet_type = _.find(_this.types, ['title', req.body.pet_type]);
     if (req.body.pet_type_id) pet_type = _.find(_this.types, (t) => { return t.id == req.body.pet_type_id; });
-    if (typeof pet_type == 'undefined') pet_type = _.find(_this.types, ['title', 'Dog']);
+    if (typeof pet_type == 'undefined' || _.isEmpty(pet_type)) pet_type = _.find(_this.types, ['title', 'Dog']);
     _this.db.Pet.create({
       name: req.body.name,
       pet_type_id: pet_type.id,
@@ -50,19 +50,19 @@ class Pet extends BaseRoute{
   }
 
   update(req, res) {
-    req.checkParams('pet_id', 'An pet id is required.').notEmpty().isNumeric();
+    req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
     req.checkBody('name', 'Name is required.').notEmpty();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    let pet_type = {};
-    if (req.body.pet_type) pet_type = _.find(_this.types, ['title', req.body.pet_type]);
-    if (req.body.pet_type_id) pet_type = _.find(_this.types, (t) => { return t.id == req.body.pet_type_id; });
-    if (typeof pet_type == 'undefined') pet_type = _.find(_this.types, ['title', 'Dog']);
     _this.db.Pet.findByPk(req.params.pet_id).then((pet) => {
       if (!pet) return res.status(404).json({ success: false, errors: [{ type: 'pet.update.not_found', message: 'No pet found for provided id.' }]});
+      let pet_type = {};
+      if (req.body.pet_type) pet_type = _.find(_this.types, ['title', req.body.pet_type]);
+      if (req.body.pet_type_id) pet_type = _.find(_this.types, (t) => { return t.id == req.body.pet_type_id; });
+      if (typeof pet_type == 'undefined' || _.isEmpty(pet_type)) pet_type = pet.pet_type;
       pet.update({
-        name: req.body.name,
+        name: req.body.name || pet.name,
         pet_type_id: pet_type.id,
-        comments: req.body.comments
+        comments: req.body.comments || pet.comments
       }).then((pet) => {
         _this.log.info('Updated pet ' + pet.title + ', id: ' + pet.id + ' for user ' + req.user.email);
         return res.status(201).json({ success: true, message: 'Pet updated successfully.' });

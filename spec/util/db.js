@@ -233,7 +233,7 @@ let pet = {
       name: 'Test Pet',
       pet_type_id: 1,
       comments: 'Good dog.',
-      PetType: {
+      pet_type: {
         id: 1,
         title: 'Dog'
       },
@@ -245,7 +245,7 @@ let pet = {
               id: 1,
               name: 'Test Pet',
               pet_type_id: 1,
-              PetType: {
+              pet_type: {
                 id: 1,
                 title: 'Dog'
               },
@@ -266,7 +266,7 @@ let pets = {
       name: 'Test Pet',
       pet_type_id: 1,
       comments: 'Good dog.',
-      PetType: {
+      pet_type: {
         id: 1,
         title: 'Dog'
       },
@@ -280,7 +280,7 @@ let pets = {
               pet_type_id: 1,
               comments: 'Good dog.',
               Transfers: [transferData],
-              PetType: {
+              pet_type: {
                 id: 1,
                 title: 'Dog'
               }
@@ -307,38 +307,38 @@ module.exports = {
     create: function() { return user; },
     findOrCreate: function() { return user; },
     describe: function() { return userDescribe; },
-    findById: function() { return user; }
+    findByPk: function() { return user; }
   },
   Role: {
     findOne: function() { return role; }
   },
   Event: {
     create: function() { return event; },
-    findById: function() { return event; },
+    findByPk: function() { return event; },
     update: function() { return event; },
     findAll: function() { return events; }
   },
   Rescue: {
     create: function() { return rescue; },
-    findById: function() { return rescue; },
+    findByPk: function() { return rescue; },
     update: function() { return rescue; },
     findAll: function() { return rescues; }
   },
   Schedule: {
     create: function() { return schedule; },
-    findById: function() { return schedule; },
+    findByPk: function() { return schedule; },
     update: function() { return schedule; },
     findAll: function() { return schedules; }
   },
   ScheduleItem: {
     create: function() { return scheduleItem; },
-    findById: function() { return scheduleItem; },
+    findByPk: function() { return scheduleItem; },
     update: function() { return scheduleItem; },
     findAll: function() { return scheduleItems; }
   },
   Pet: {
     create: function() { return pet; },
-    findById: function() { return pet; },
+    findByPk: function() { return pet; },
     update: function() { return pet; },
     findAll: function() { return pets; }
   },
@@ -348,5 +348,5 @@ module.exports = {
   Transfer: {
     create: function() { return transfer; },
     findOne: function() { return transfer; }
-  } 
+  }
 }

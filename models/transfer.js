@@ -26,4 +26,4 @@ module.exports = class Transfer extends Model {
       event: this.Event
     };
   }
-}
+};

@@ -12,7 +12,6 @@ module.exports = class User extends Model {
       confirmed: { type: Sequelize.DATE, allowNull: true },
       role_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Roles', key: 'id' }, validate: { notEmpty: true, isNumeric: true }}
     }, {
-      modelName: 'user',
       underscored: true,
       sequelize
     });
@@ -40,4 +39,4 @@ module.exports = class User extends Model {
       events: this.Events
     };
   }
-}
+};

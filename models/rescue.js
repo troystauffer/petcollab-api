@@ -38,4 +38,4 @@ module.exports = class Rescue extends Model {
       receiving_events: this.ReceivingEvents
     };
   }
-}
+};

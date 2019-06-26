@@ -28,4 +28,4 @@ module.exports = class Pet extends Model {
       transfers: this.Transfers
     };
   }
-}
+};

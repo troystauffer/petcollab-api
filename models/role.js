@@ -21,4 +21,4 @@ module.exports = class Role extends Model {
       title: this.title
     };
   }
-}
+};

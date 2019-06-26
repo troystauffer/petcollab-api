@@ -12,7 +12,7 @@ class Schedule extends BaseRoute {
   list(req, res) {
     req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    Crud.list({ classname: 'Schedule', foreignKeyClassname: 'event', foreignKeyValue: req.params.schedule_id, db: _this.db, res: res });
+    Crud.list({ classname: 'Schedule', foreignKeyClassname: 'event', foreignKeyValue: req.params.event_id, db: _this.db, res: res });
   }
 
   detail(req, res) {

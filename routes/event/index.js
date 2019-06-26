@@ -4,7 +4,7 @@ class EventRoutes {
     router.get('/events.:format?', event.list);
     router.get('/events/:event_id.:format?', event.detail);
     router.post('/events.:format?',  event.create);
-    router.post('/events/:event_id.:format?', event.update);
+    router.patch('/events/:event_id.:format?', event.update);
     router.delete('/events/:event_id.:format?', event.delete);
   }
 }
