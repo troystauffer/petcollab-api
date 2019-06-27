@@ -66,9 +66,9 @@ class User extends BaseRoute {
         _this.UserToken.generateToken(_this.config.confirmationTokenLength, function(token) {
           _this.log.info('Confirmation token generated for user ' + user.email + ': ' + token);
           user.confirmation_token = token;
-          user.role = role;
-          user.save().then(function(user) {
-            return validateUser(user, res, err);
+          user.role_id = role.id;
+          user.save().then(function() {
+            return res.status(201).json({success: true, message: 'Account updated successfully.', response: { confirmation_token: token }});
           });
         });
       });
@@ -94,6 +94,7 @@ class User extends BaseRoute {
     super.isAuthorized('user.list', req.user.user_id, function(authorized) {
       if (!authorized) return res.status(403).json({ success: false, message: 'Not authorized to view this resource.' });
       _this.db.User.findAll({
+        where: { confirmed: { [_this.db.Sequelize.Op.ne ]: null }},
         include: [ _this.db.Role ], order: [['name', 'ASC']]
       }).then((users) => {
         return res.status(200).json({ success: true, response: users });

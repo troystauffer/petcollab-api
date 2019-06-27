@@ -98,7 +98,7 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      validate(req, res, { success: true, "message": "Account updated successfully." }, 201, userRoutes.create);
+      validate(req, res, { success: true, "message": "Account updated successfully.", response: { confirmation_token: "token" }}, 201, userRoutes.createUser);
       expect(pwcrypt.calls.secureHash).toEqual(1);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
