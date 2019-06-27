@@ -88,6 +88,18 @@ class User extends BaseRoute {
       });
     });
   }
+
+  list(req, res) {
+    _this.log.info('User ' + req.user.email + ' requesting list of users...');
+    super.isAuthorized('user.list', req.user.user_id, function(authorized) {
+      if (!authorized) return res.status(403).json({ success: false, message: 'Not authorized to view this resource.' });
+      _this.db.User.findAll({
+        include: [ _this.db.Role ], order: [['name', 'ASC']]
+      }).then((users) => {
+        return res.status(200).json({ success: true, response: users });
+      });
+    });
+  }
 }
 
 function validateUser(user, res, err) {

@@ -1,5 +1,5 @@
 import path from 'path';
-import User from '../../routes/user/user';
+import UserRoutes from '../../routes/user/user';
 import Res from '../util/res';
 import Req from '../util/req';
 import db from '../util/db';
@@ -21,12 +21,12 @@ describe('User', () => {
     req = new Req();
     pwcrypt = new Pwcrypt();
     userToken = new UserToken();
-    userRoutes = new User({ 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+    userRoutes = new UserRoutes({ 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
   })
 
   describe('misc endpoints', () => {
     it('should return user info', () => {
-      validate(req, res, { success: true, response: { user: {id: 1} }}, 200, userRoutes.info);
+      validate(req, res, { success: true, response: { user: { id: 1 }}}, 200, userRoutes.info);
     });
 
     it('should return a well formed error', () => {
@@ -108,7 +108,7 @@ describe('User', () => {
     });
 
     it('should prevent duplicate email addresses', () => {
-      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+      let userRoutesFailure = new UserRoutes({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
       req.body = {
         email: 'duplicate@example.com',
         password: 'password',
@@ -131,6 +131,24 @@ describe('User', () => {
       };
       req.body = user;
       validate(req, res, { success: true, message: 'Account updated successfully.' }, 201, userRoutes.update);
+    });
+  });
+
+  describe('admin', () => {
+    describe('user list', () => {
+      it('should fail for a non-admin user', () => {
+        let standardUserDb = Object.assign({}, db);
+        standardUserDb.User = standardUserDb.StandardUser;
+        let standardUserRoutes = new UserRoutes({ 'db': standardUserDb, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+        validate(req, res, {success: false, "message":"Not authorized to view this resource."}, 403, standardUserRoutes.list);
+      });
+
+      it('should work for a super admin user', () => {
+        let superAdminUserDb = Object.assign({}, db);
+        superAdminUserDb.User = superAdminUserDb.SuperAdminUser;
+        let superAdminUserRoutes = new UserRoutes({ 'db': superAdminUserDb, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+        validate(req, res, {success: true, response: [{ id: 1 }]}, 200, superAdminUserRoutes.list);
+      });
     });
   });
 
@@ -162,7 +180,7 @@ describe('User', () => {
     });
 
     it('should error on invalid token', () => {
-      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+      let userRoutesFailure = new UserRoutes({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
       req.body = {
         email: 'testunit@example.com',
         confirmation_token: 'invalid'

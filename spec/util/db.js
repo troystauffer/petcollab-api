@@ -35,6 +35,51 @@ let user = {
     }, true);
   }
 };
+let users = {
+  then: function(callback) {
+    callback([{
+      id: 1
+    }])
+  }
+};
+let super_admin_user = Object.assign({}, user);
+super_admin_user.then = function(callback) {
+  callback({
+    id: 1,
+    save: function() {
+      return {
+        then: function(callback) {
+          callback({ id: 1 });
+        }
+      }
+    },
+    setRole: function() {
+      return true;
+    },
+    isSuperAdmin: function() {
+      return true
+    }
+  })
+};
+let standard_user = Object.assign({}, user);
+standard_user.then = function(callback) {
+  callback({
+    id: 1,
+    save: function() {
+      return {
+        then: function(callback) {
+          callback({ id: 1 });
+        }
+      }
+    },
+    setRole: function() {
+      return true;
+    },
+    isSuperAdmin: function() {
+      return false
+    }
+  })
+};
 let eventData = {
   id: 1,
   title: 'Test Event',
@@ -148,63 +193,6 @@ let scheduleItems = {
     }]);
   }
 }
-let userTable = {
-  "id": {
-    "type": "INTEGER",
-    "allowNull": true,
-    "primaryKey": true
-  },
-  "name": {
-    "type": "VARCHAR(255)",
-    "allowNull": true,
-    "primaryKey": false
-  },
-  "facebook_id": {
-    "type": "VARCHAR(255)",
-    "allowNull": true,
-    "primaryKey": false
-  },
-  "created_at": {
-    "type": "DATETIME",
-    "allowNull": false,
-    "primaryKey": false
-  },
-  "updated_at": {
-    "type": "DATETIME",
-    "allowNull": false,
-    "primaryKey": false
-  },
-  "email": {
-    "type": "VARCHAR(255)",
-    "allowNull": true,
-    "primaryKey": false
-  },
-  "password_hash": {
-    "type": "TEXT",
-    "allowNull": true,
-    "primaryKey": false
-  },
-  "salt": {
-    "type": "VARCHAR(255)",
-    "allowNull": true,
-    "primaryKey": false
-  },
-  "confirmed": {
-    "type": "DATETIME",
-    "allowNull": true,
-    "defaultValue": null,
-    "primaryKey": false
-  },
-  "confirmation_token": {
-    "type": "VARCHAR(255)",
-    "allowNull": true,
-    "defaultValue": null,
-    "primaryKey": false
-  }
-}
-let userDescribe = {
-  then: function(callback) { callback(userTable) }
-}
 let role = {
   then: function(callback) {
     callback({
@@ -306,8 +294,22 @@ module.exports = {
     findOne: function() { return user; },
     create: function() { return user; },
     findOrCreate: function() { return user; },
-    describe: function() { return userDescribe; },
-    findByPk: function() { return user; }
+    findByPk: function() { return user; },
+    findAll: function() { return users; }
+  },
+  SuperAdminUser: {
+    findOne: function() { return super_admin_user; },
+    create: function() { return super_admin_user; },
+    findOrCreate: function() { return super_admin_user; },
+    findByPk: function() { return super_admin_user; },
+    findAll: function() { return users; }
+  },
+  StandardUser: {
+    findOne: function() { return standard_user; },
+    create: function() { return standard_user; },
+    findOrCreate: function() { return standard_user; },
+    findByPk: function() { return standard_user; },
+    findAll: function() { return users; }
   },
   Role: {
     findOne: function() { return role; }
