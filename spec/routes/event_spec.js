@@ -9,7 +9,7 @@ describe('Event', () => {
   let res = {};
   let req = {};
   let eventRoutes = {};
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -201,7 +201,7 @@ describe('Event', () => {
     });
     it('should delete an event', () => {
       req.params = { event_id: 1 };
-      validate(req, res, { success: true, message: 'Event deleted.' }, 200, eventRoutes.delete);
+      validate(req, res, { success: true, response: { message: 'Event deleted.' }}, 200, eventRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

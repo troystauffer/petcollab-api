@@ -130,7 +130,7 @@ describe('Pet', () => {
     });
     it('should delete an pet', () => {
       req.params = { pet_id: 1 };
-      validate(req, res, { success: true, message: 'Pet deleted.' }, 200, petRoutes.delete);
+      validate(req, res, { success: true, response: { message: 'Pet deleted.' }}, 200, petRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

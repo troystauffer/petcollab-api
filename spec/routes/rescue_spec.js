@@ -9,7 +9,7 @@ describe('Rescue', () => {
   let res = {};
   let req = {};
   let rescueRoutes = {};
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -91,7 +91,7 @@ describe('Rescue', () => {
     });
     it('should delete an rescue', () => {
       req.params = { rescue_id: 1 };
-      validate(req, res, { success: true, message: 'Rescue deleted.' }, 200, rescueRoutes.delete);
+      validate(req, res, { success: true, response: { message: 'Rescue deleted.' }}, 200, rescueRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

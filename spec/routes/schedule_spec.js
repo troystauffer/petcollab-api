@@ -147,7 +147,7 @@ describe('Schedule', () => {
     });
     it('should delete a schedule', () => {
       req.params = { schedule_id: 1 };
-      validate(req, res, { success: true, message: 'Schedule deleted.' }, 200, scheduleRoutes.delete);
+      validate(req, res, { success: true, response: { message: 'Schedule deleted.' }}, 200, scheduleRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

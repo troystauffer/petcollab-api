@@ -1,4 +1,5 @@
 import BaseRoute from '../base_route';
+import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -94,11 +95,17 @@ class User extends BaseRoute {
     super.isAuthorized('user.list', req.user.user_id, function(authorized) {
       if (!authorized) return res.status(403).json({ success: false, message: 'Not authorized to view this resource.' });
       _this.db.User.findAll({
-        where: { confirmed: { [_this.db.Sequelize.Op.ne ]: null }},
         include: [ _this.db.Role ], order: [['name', 'ASC']]
       }).then((users) => {
         return res.status(200).json({ success: true, response: users });
       });
+    });
+  }
+
+  delete(req, res) {
+    super.isAuthorized('user.delete', req.user.user_id, function(authorized) {
+      if (!authorized) return res.status(403).json({ success: false, message: 'Not authorized to view this resource.' });
+      Crud.delete({ classname: 'User', db: _this.db, req: req, res: res });
     });
   }
 }

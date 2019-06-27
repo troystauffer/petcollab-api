@@ -11,7 +11,7 @@ class BaseRoute {
   }
 
   isAuthorized(route, user_id, callback) {
-    if (!_.includes(['user.list'], route)) return callback(true);
+    if (!_.includes(['user.list', 'user.delete'], route)) return callback(true);
     _this.db.User.findByPk(user_id).then((user) => {
       if (!user) return callback(false);
       user.isSuperAdmin(function(is) {
