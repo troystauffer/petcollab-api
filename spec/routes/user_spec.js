@@ -1,5 +1,5 @@
 import path from 'path';
-import User from '../../routes/user/user';
+import UserRoutes from '../../routes/user/user';
 import Res from '../util/res';
 import Req from '../util/req';
 import db from '../util/db';
@@ -21,12 +21,12 @@ describe('User', () => {
     req = new Req();
     pwcrypt = new Pwcrypt();
     userToken = new UserToken();
-    userRoutes = new User({ 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+    userRoutes = new UserRoutes({ 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
   })
 
   describe('misc endpoints', () => {
     it('should return user info', () => {
-      validate(req, res, { success: true, response: { user: {id: 1} }}, 200, userRoutes.info);
+      validate(req, res, { success: true, response: { user: { id: 1 }}}, 200, userRoutes.info);
     });
 
     it('should return a well formed error', () => {
@@ -41,9 +41,8 @@ describe('User', () => {
         name: 'Test Unit'
       };
       let validationErrors = [{ "param": "email", "msg": "Email is required." }, { "param": "email", "msg": "Email must be a valid email address." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -55,9 +54,8 @@ describe('User', () => {
         name: 'Test Unit'
       };
       let validationErrors = { "param": "password", "msg": "Password is required." };
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -69,9 +67,8 @@ describe('User', () => {
         password: 'password'
       };
       let validationErrors = { "param": "name", "msg": "Name is required." };
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -84,9 +81,8 @@ describe('User', () => {
         name: 'Test Unit'
       };
       let validationErrors = { "param": "email", "msg": "Email must be a valid email address." };
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -98,7 +94,7 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      validate(req, res, { success: true, "message": "Account updated successfully." }, 201, userRoutes.create);
+      validate(req, res, { success: true, "message": "Account updated successfully.", response: { confirmation_token: "token" }}, 201, userRoutes.createUser);
       expect(pwcrypt.calls.secureHash).toEqual(1);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
@@ -108,7 +104,7 @@ describe('User', () => {
     });
 
     it('should prevent duplicate email addresses', () => {
-      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+      let userRoutesFailure = new UserRoutes({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
       req.body = {
         email: 'duplicate@example.com',
         password: 'password',
@@ -134,13 +130,30 @@ describe('User', () => {
     });
   });
 
+  describe('admin', () => {
+    describe('user list', () => {
+      it('should fail for a non-admin user', () => {
+        let standardUserDb = Object.assign({}, db);
+        standardUserDb.User = standardUserDb.StandardUser;
+        let standardUserRoutes = new UserRoutes({ 'db': standardUserDb, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+        validate(req, res, {success: false, "message":"Not authorized to view this resource."}, 403, standardUserRoutes.list);
+      });
+
+      it('should work for a super admin user', () => {
+        let superAdminUserDb = Object.assign({}, db);
+        superAdminUserDb.User = superAdminUserDb.SuperAdminUser;
+        let superAdminUserRoutes = new UserRoutes({ 'db': superAdminUserDb, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+        validate(req, res, {success: true, response: [{ id: 1 }]}, 200, superAdminUserRoutes.list);
+      });
+    });
+  });
+
   describe('confirmation', () => {
     it('should fail without a confirmation token', () => {
       req.body = { email: 'testunit@example.com' };
       let validationErrors = {"param":"confirmation_token","msg":"A valid confirmation token is required."};
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutes.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);
@@ -151,9 +164,8 @@ describe('User', () => {
     it('should fail without an email address', () => {
       req.body = { confirmation_token: 'asdf' };
       let validationErrors = [{"param":"email","msg":"A valid email is required."},{"param":"email","msg":"A valid email is required."}];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutes.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);
@@ -162,7 +174,7 @@ describe('User', () => {
     });
 
     it('should error on invalid token', () => {
-      let userRoutesFailure = new User({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
+      let userRoutesFailure = new UserRoutes({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': userToken, 'log': log });
       req.body = {
         email: 'testunit@example.com',
         confirmation_token: 'invalid'

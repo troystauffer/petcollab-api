@@ -6,6 +6,8 @@ class UserRoutes {
     router.post('/users.:format?', user.createUser);
     router.post('/users/confirm.:format?', user.confirm);
     router.patch('/users.:format?', user.update);
+    router.get('/admin/users.:format?', user.list);
+    router.delete('/admin/users/:user_id.:format?', user.delete);
   }
 }
 

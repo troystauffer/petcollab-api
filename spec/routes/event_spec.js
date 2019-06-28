@@ -9,7 +9,7 @@ describe('Event', () => {
   let res = {};
   let req = {};
   let eventRoutes = {};
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -32,9 +32,8 @@ describe('Event', () => {
         ends_at: '2017-04-16 12:00:00 GMT'
       };
       let validationErrors = [{ "param": "title", "msg": "Title is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.create);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutes.create);
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(3);
     });
@@ -44,9 +43,8 @@ describe('Event', () => {
         ends_at: '2017-04-16 12:00:00 GMT'
       };
       let validationErrors = [{ "param": "starts_at", "msg": "Start date is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.create);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutes.create);
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(3);
     });
@@ -56,9 +54,8 @@ describe('Event', () => {
         starts_at: '2017-04-16 12:00:00 GMT'
       };
       let validationErrors = [{ "param": "ends_at", "msg": "End date is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.create);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutes.create);
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(3);
     });
@@ -99,9 +96,8 @@ describe('Event', () => {
   describe('details', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.detail);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -128,9 +124,8 @@ describe('Event', () => {
     it('should fail with an invalid id', () => {
       req.params = { id: 'asdf' };
       let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(4);
@@ -142,9 +137,8 @@ describe('Event', () => {
         ends_at: '2017-04-16 12:00:00 GMT'
       };
       let validationErrors = [{ "param": "title", "msg": "Title is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, eventRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(3);
       expect(req.calls.notEmpty).toEqual(4);
@@ -201,7 +195,7 @@ describe('Event', () => {
     });
     it('should delete an event', () => {
       req.params = { event_id: 1 };
-      validate(req, res, { success: true, message: 'Event deleted.' }, 200, eventRoutes.delete);
+      validate(req, res, { success: true, response: { message: 'Event deleted.' }}, 200, eventRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);

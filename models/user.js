@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const Model = Sequelize.Model;
+const SUPER_ADMIN_ROLE = 'super_admin';
 
 module.exports = class User extends Model {
   static init(sequelize) {
@@ -35,5 +36,11 @@ module.exports = class User extends Model {
       confirmed: this.confirmed,
       role_id: this.role_id
     };
+  }
+
+  isSuperAdmin(callback) {
+    User.sequelize.model('Role').findOne({ where: { title: SUPER_ADMIN_ROLE }}).then((role) => {
+      return callback(this.role_id == role.id);
+    });
   }
 };

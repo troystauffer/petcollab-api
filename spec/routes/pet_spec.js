@@ -28,9 +28,8 @@ describe('Pet', () => {
   describe('creation', () => {
     it('should fail without an pet name', () => {
       let validationErrors = [{ "param": "name", "msg": "Name is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, petRoutes.create);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutes.create);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
     });
@@ -51,9 +50,8 @@ describe('Pet', () => {
   describe('details', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "msg": "A pet id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, petRoutes.detail);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -80,9 +78,8 @@ describe('Pet', () => {
       req.params = { id: 'asdf' };
       req.body = {};
       let validationErrors = [{ "param": "id", "msg": "A pet id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, petRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(2);
@@ -95,9 +92,8 @@ describe('Pet', () => {
         ends_at: '2017-04-16 12:00:00 GMT'
       };
       let validationErrors = [{ "param": "name", "msg": "Name is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, petRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(2);
@@ -130,7 +126,7 @@ describe('Pet', () => {
     });
     it('should delete an pet', () => {
       req.params = { pet_id: 1 };
-      validate(req, res, { success: true, message: 'Pet deleted.' }, 200, petRoutes.delete);
+      validate(req, res, { success: true, response: { message: 'Pet deleted.' }}, 200, petRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -140,20 +136,18 @@ describe('Pet', () => {
   describe('tranferring', () => {
     it('should fail without a pet id', () => {
       let validationErrors = [{ "param": "id", "msg": "A pet id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.params = { event_id: 1 };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, petRoutes.transfer);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutes.transfer);
       expect(req.calls.checkParams).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isNumeric).toEqual(2);
     });
     it('should fail without an event id', () => {
       let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.params = { pet_id: 1 };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, petRoutes.transfer);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutes.transfer);
       expect(req.calls.checkParams).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isNumeric).toEqual(2);

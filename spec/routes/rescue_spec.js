@@ -9,7 +9,7 @@ describe('Rescue', () => {
   let res = {};
   let req = {};
   let rescueRoutes = {};
-  
+
   beforeEach(() => {
     res = new Res();
     req = new Req();
@@ -34,9 +34,8 @@ describe('Rescue', () => {
   describe('details', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "msg": "A rescue id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, rescueRoutes.detail);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, rescueRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -62,9 +61,8 @@ describe('Rescue', () => {
     it('should fail with an invalid id', () => {
       req.params = { rescue_id: 'asdf' };
       let validationErrors = [{ "param": "id", "msg": "A rescue id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, rescueRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, rescueRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -91,7 +89,7 @@ describe('Rescue', () => {
     });
     it('should delete an rescue', () => {
       req.params = { rescue_id: 1 };
-      validate(req, res, { success: true, message: 'Rescue deleted.' }, 200, rescueRoutes.delete);
+      validate(req, res, { success: true, response: { message: 'Rescue deleted.' }}, 200, rescueRoutes.delete);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
