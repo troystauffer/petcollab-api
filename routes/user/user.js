@@ -95,7 +95,7 @@ class User extends BaseRoute {
     super.isAuthorized('user.list', req.user.user_id, function(authorized) {
       if (!authorized) return res.status(403).json({ success: false, message: 'Not authorized to view this resource.' });
       _this.db.User.findAll({
-        include: [ _this.db.Role ], order: [['name', 'ASC']]
+        include: [ "Role" ], order: [['name', 'ASC']]
       }).then((users) => {
         return res.status(200).json({ success: true, response: users });
       });

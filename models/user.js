@@ -34,7 +34,8 @@ module.exports = class User extends Model {
       name: this.name,
       email: this.email,
       confirmed: this.confirmed,
-      role_id: this.role_id
+      role_id: this.role_id,
+      role: this.Role
     };
   }
 
