@@ -31,17 +31,15 @@ describe('Auth', () => {
     it('should fail without email', () => {
       req.body = { password: 'password' };
       let validationErrors = [{ param: 'email', msg: 'Email is required.' }, { param: 'email', msg: 'Email must be a valid email address.' }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.authenticate);
+      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutes.authenticate);
     });
 
     it('should fail without password', () => {
       req.body = { email: 'testunit@example.com' };
       let validationErrors = [{"param":"password","msg":"A valid password is required."}];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, authRoutes.authenticate);
+      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutes.authenticate);
     });
 
     it('should fail on invalid email', () => {

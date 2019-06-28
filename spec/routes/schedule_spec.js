@@ -19,9 +19,8 @@ describe('Schedule', () => {
   describe('listing', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleRoutes.list);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutes.list);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -44,9 +43,8 @@ describe('Schedule', () => {
     it('should fail without a title', () => {
       req.params = { event_id: 1 };
       let validationErrors = [{ "param": "title", "msg": "Title is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleRoutes.create);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutes.create);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(2);
@@ -75,9 +73,8 @@ describe('Schedule', () => {
   describe('details', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "schedule_id", "msg": "A schedule id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleRoutes.detail);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -103,9 +100,8 @@ describe('Schedule', () => {
     it('should fail with an invalid id', () => {
       req.params = { schedule_id: 'asdf' };
       let validationErrors = [{ "param": "schedule_id", "msg": "A schedule id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(2);
@@ -114,9 +110,8 @@ describe('Schedule', () => {
     it('should fail without a schedule title', () => {
       req.body = {};
       let validationErrors = [{ "param": "title", "msg": "Title is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(2);

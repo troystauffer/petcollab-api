@@ -41,9 +41,8 @@ describe('User', () => {
         name: 'Test Unit'
       };
       let validationErrors = [{ "param": "email", "msg": "Email is required." }, { "param": "email", "msg": "Email must be a valid email address." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -55,9 +54,8 @@ describe('User', () => {
         name: 'Test Unit'
       };
       let validationErrors = { "param": "password", "msg": "Password is required." };
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -69,9 +67,8 @@ describe('User', () => {
         password: 'password'
       };
       let validationErrors = { "param": "name", "msg": "Name is required." };
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -84,9 +81,8 @@ describe('User', () => {
         name: 'Test Unit'
       };
       let validationErrors = { "param": "email", "msg": "Email must be a valid email address." };
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", "errors": [error]}, 400, userRoutes.create);
+      validate(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutes.create);
       expect(req.calls.checkBody).toEqual(4);
       expect(req.calls.notEmpty).toEqual(3);
       expect(req.calls.isEmail).toEqual(1);
@@ -156,9 +152,8 @@ describe('User', () => {
     it('should fail without a confirmation token', () => {
       req.body = { email: 'testunit@example.com' };
       let validationErrors = {"param":"confirmation_token","msg":"A valid confirmation token is required."};
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutes.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);
@@ -169,9 +164,8 @@ describe('User', () => {
     it('should fail without an email address', () => {
       req.body = { confirmation_token: 'asdf' };
       let validationErrors = [{"param":"email","msg":"A valid email is required."},{"param":"email","msg":"A valid email is required."}];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.","errors":[error]}, 400, userRoutes.confirm);
+      validate(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutes.confirm);
       expect(req.calls.checkBody).toEqual(2);
       expect(req.calls.notEmpty).toEqual(2);
       expect(req.calls.isAlphanumeric).toEqual(1);

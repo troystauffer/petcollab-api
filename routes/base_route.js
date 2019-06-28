@@ -7,7 +7,7 @@ class BaseRoute {
   }
 
   validationErrorResponse(res, errors) {
-    return res.status(400).json({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [{ type: 'api.params.invalid', validation: errors }]});
+    return res.status(400).json({ success: false, message: 'The data provided to the API was invalid or incomplete.', errors: errors });
   }
 
   isAuthorized(route, user_id, callback) {

@@ -19,9 +19,8 @@ describe('Schedule item', () => {
   describe('listing', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "msg": "A schedule id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleItemRoutes.list);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutes.list);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -48,9 +47,8 @@ describe('Schedule item', () => {
     it('should fail without a schedule id', () => {
       req.params = {};
       let validationErrors = [{ "param": "id", "msg": "Schedule id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleItemRoutes.create);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutes.create);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.checkBody).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
@@ -86,9 +84,8 @@ describe('Schedule item', () => {
   describe('details', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "msg": "A schedule item id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleItemRoutes.detail);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutes.detail);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
@@ -114,9 +111,8 @@ describe('Schedule item', () => {
     it('should fail with an invalid id', () => {
       req.params = { id: 'asdf' };
       let validationErrors = [{ "param": "id", "msg": "A schedule item id is required." }];
-      let error = { type: 'api.params.invalid', validation: validationErrors };
       req.validationErrors = function() { return validationErrors };
-      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: [error] }, 400, scheduleItemRoutes.update);
+      validate(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutes.update);
       expect(req.calls.checkParams).toEqual(1);
       expect(req.calls.notEmpty).toEqual(1);
       expect(req.calls.isNumeric).toEqual(1);
