@@ -25,7 +25,7 @@ describe('Auth', () => {
     https = new HTTPS();
     jws = new JWS();
     authRoutes = new Auth({ 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https, 'encryption': encryption });
-  })
+  });
 
   describe('standard authentication', () => {
     it('should fail without email', () => {
@@ -76,7 +76,7 @@ describe('Auth', () => {
         email: 'testunit@example.com',
         password: 'password'
       };
-      validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "encrypted"} }, 200, authRoutes.authenticate);
+      validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "encrypted", role: { id: 1, title: "user" }}}, 200, authRoutes.authenticate);
       expect(pwcrypt.calls.verify).toEqual(1);
       expect(jws.calls.sign).toEqual(1);
     });

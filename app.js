@@ -40,8 +40,10 @@ function App() {
   router.use(authenticated.unless({ path: unsecuredRoutes }));
 
   // define routes
-  new (require(path.join(__dirname, 'routes/user')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config, 'UserToken': UserToken, 'log': log });
-  new (require(path.join(__dirname, 'routes/auth')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'encryption': encryption, 'log': log, 'https': https });
+  new (require(path.join(__dirname, 'routes/user')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config,
+    'UserToken': UserToken, 'log': log });
+  new (require(path.join(__dirname, 'routes/auth')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws,
+    'config': config, 'encryption': encryption, 'log': log, 'https': https });
   new (require(path.join(__dirname, 'routes/event')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/schedule')))(router, { 'db': db, 'log': log });
   new (require(path.join(__dirname, 'routes/schedule_item')))(router, { 'db': db, 'log': log });

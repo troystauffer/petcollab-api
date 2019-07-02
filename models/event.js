@@ -7,9 +7,12 @@ module.exports = class Event extends Model {
       title: { type: Sequelize.STRING, allowNull: false, validate: { notEmpty: true }},
       starts_at: { type: Sequelize.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
       ends_at: { type: Sequelize.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
-      owner_user_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'Users', key: 'id' }, validate: { notEmpty: true, isNumeric: true }},
-      releasing_rescue_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Rescues', key: 'id' }, validate: { notEmpty: false }},
-      receiving_rescue_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Rescues', key: 'id' }, validate: { notEmpty: false }}
+      owner_user_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'Users', key: 'id' },
+        validate: { notEmpty: true, isNumeric: true }},
+      releasing_rescue_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Rescues', key: 'id' },
+        validate: { notEmpty: false }},
+      receiving_rescue_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Rescues', key: 'id' },
+        validate: { notEmpty: false }}
     }, {
       underscored: true,
       sequelize

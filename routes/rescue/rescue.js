@@ -34,7 +34,10 @@ class Rescue extends BaseRoute{
     req.checkParams('rescue_id', 'A rescue id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
     _this.db.Rescue.findByPk(req.params.rescue_id).then((rescue) => {
-      if (!rescue) return res.status(404).json({ success: false, errors: [{ type: 'rescue.update.not_found', message: 'No event found for provided id.' }]});
+      if (!rescue) return res.status(404).json({ success: false, errors: [{
+        type: 'rescue.update.not_found',
+        message: 'No event found for provided id.'
+      }]});
       rescue.update({
         name: req.body.name,
         street_address: req.body.street_address,
