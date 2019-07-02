@@ -30,6 +30,7 @@ module.exports = function(){
         database: 'papi_dev',
         username: process.env.PAPI_DATABASE_USERNAME,
         password: process.env.PAPI_DATABASE_PASSWORD,
+        port: process.env.PAPI_DATABASE_PORT || 3306,
         host: '127.0.0.1'
       },
       log: {
@@ -53,6 +54,7 @@ module.exports = function(){
         database: 'papi_test',
         username: process.env.PAPI_DATABASE_USERNAME,
         password: process.env.PAPI_DATABASE_PASSWORD,
+        port: process.env.PAPI_DATABASE_PORT || 3306,
         host: '127.0.0.1'
       },
       log: {
