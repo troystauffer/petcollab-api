@@ -12,7 +12,8 @@ class ScheduleItem extends BaseRoute {
   list(req, res) {
     req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
     if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    Crud.list({ classname: 'ScheduleItem', foreignKeyClassname: 'Schedule', foreignKeyValue: req.params.schedule_id, db: _this.db, res: res });
+    Crud.list({ classname: 'ScheduleItem', foreignKeyClassname: 'Schedule', foreignKeyValue: req.params.schedule_id,
+      db: _this.db, res: res });
   }
 
   detail(req, res) {
@@ -26,7 +27,10 @@ class ScheduleItem extends BaseRoute {
     req.sanitizeBody('starts_at').toDate();
     req.sanitizeBody('ends_at').toDate();
     _this.db.Schedule.findByPk(req.params.schedule_id).then((schedule) => {
-      if (!schedule) return res.status(404).json({ success: false, errors: [{ type: 'schedule_item.create.not_found', message: 'No schedule found for provided id.'}]});
+      if (!schedule) return res.status(404).json({ success: false, errors: [{
+        type: 'schedule_item.create.not_found',
+        message: 'No schedule found for provided id.'
+      }]});
       _this.db.ScheduleItem.create({
         schedule_id: schedule.id,
         assigned_user_id: req.body.assigned_user_id || null,
@@ -36,7 +40,8 @@ class ScheduleItem extends BaseRoute {
         order: req.body.order || null
       }).then((schedule_item) => {
         _this.log.info('Created schedule item ' + schedule_item.id + ' for user ' + req.user.email);
-        return res.status(201).json({ success: true, message: 'Schedule item created successfully.', response: { schedule_item }});
+        return res.status(201).json({ success: true, message: 'Schedule item created successfully.',
+          response: { schedule_item }});
       });
     });
   }
@@ -48,7 +53,10 @@ class ScheduleItem extends BaseRoute {
     req.sanitizeBody('ends_at').toDate();
     req.sanitizeBody('checked_in_at').toDate();
     _this.db.ScheduleItem.findByPk(req.params.schedule_item_id).then((item) => {
-      if (!item) return res.status(404).json({ success: false, errors: [{ type: 'schedule_item.update.not_found', message: 'No schedule_item found for provided id.'}]});
+      if (!item) return res.status(404).json({ success: false, errors: [{
+        type: 'schedule_item.update.not_found',
+        message: 'No schedule_item found for provided id.'
+      }]});
       let updateParams = {};
       if (req.body.assigned_user_id) updateParams['assigned_user_id'] = req.body.assigned_user_id;
       if (req.body.title) updateParams['title'] = req.body.title;

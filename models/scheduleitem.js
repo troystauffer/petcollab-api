@@ -5,8 +5,10 @@ module.exports = class ScheduleItem extends Model {
   static init(sequelize) {
     return super.init({
       title: { type: Sequelize.STRING, allowNull: true, validate: { notEmpty: true }},
-      schedule_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Schedules', key: 'id' }, validate: { notEmpty: true, isNumeric: true }},
-      assigned_user_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Users', key: 'id' }, validate: { notEmpty: true, isNumeric: true }},
+      schedule_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Schedules', key: 'id' },
+        validate: { notEmpty: true, isNumeric: true }},
+      assigned_user_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Users', key: 'id' },
+        validate: { notEmpty: true, isNumeric: true }},
       starts_at: { type: Sequelize.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
       ends_at: { type: Sequelize.DATE, allowNull: true, validate: { isDate: true, notEmpty: true }},
       order: Sequelize.INTEGER,

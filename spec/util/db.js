@@ -11,6 +11,10 @@ let user = {
       },
       setRole: function() {
         return true;
+      },
+      Role: {
+        id: 1,
+        title: 'user'
       }
     });
   },

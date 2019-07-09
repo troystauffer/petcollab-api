@@ -11,7 +11,8 @@ module.exports = class User extends Model {
       salt: { type: Sequelize.STRING, allowNull: true },
       confirmation_token: { type: Sequelize.STRING, allowNull: true },
       confirmed: { type: Sequelize.DATE, allowNull: true },
-      role_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Roles', key: 'id' }, validate: { notEmpty: true, isNumeric: true }}
+      role_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Roles', key: 'id' },
+        validate: { notEmpty: true, isNumeric: true }}
     }, {
       underscored: true,
       sequelize

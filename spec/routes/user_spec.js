@@ -26,7 +26,7 @@ describe('User', () => {
 
   describe('misc endpoints', () => {
     it('should return user info', () => {
-      validate(req, res, { success: true, response: { user: { id: 1 }}}, 200, userRoutes.info);
+      validate(req, res, { success: true, response: { user: { id: 1, Role: { id: 1, title: "user" }}}}, 200, userRoutes.info);
     });
 
     it('should return a well formed error', () => {

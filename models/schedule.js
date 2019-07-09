@@ -5,7 +5,8 @@ module.exports = class Schedule extends Model {
   static init(sequelize) {
     return super.init({
       title: { type: Sequelize.STRING, allowNull: true, validate: { notEmpty: true }},
-      event_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Roles', key: 'id' }, validate: { notEmpty: true, isNumeric: true }}
+      event_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'Roles', key: 'id' },
+        validate: { notEmpty: true, isNumeric: true }}
     }, {
       underscored: true,
       sequelize
