@@ -23,8 +23,8 @@ class Pet extends BaseRoute{
   }
 
   create(req, res) {
-    req.checkBody('name', 'Name is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     let pet_type = {};
     if (req.body.pet_type) pet_type = _.find(_this.types, ['title', req.body.pet_type]);
     if (req.body.pet_type_id) pet_type = _.find(_this.types, (t) => { return t.id == req.body.pet_type_id; });
@@ -40,8 +40,8 @@ class Pet extends BaseRoute{
   }
 
   detail(req, res) {
-    req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Pet.findByPk(req.params.pet_id, { include: [ _this.db.PetType, _this.db.Transfer ]}).then((pet) => {
       if (!pet) return res.status(404).json({ success: false, errors: [{
         type: 'pet.detail.not_found',
@@ -53,9 +53,8 @@ class Pet extends BaseRoute{
   }
 
   update(req, res) {
-    req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
-    req.checkBody('name', 'Name is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Pet.findByPk(req.params.pet_id).then((pet) => {
       if (!pet) return res.status(404).json({ success: false, errors: [{
         type: 'pet.update.not_found',
@@ -77,13 +76,14 @@ class Pet extends BaseRoute{
   }
 
   delete(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.delete({ classname: 'Pet', db: _this.db, req: req, res: res });
   }
 
   transfer(req, res) {
-    req.checkParams('pet_id', 'A pet id is required.').notEmpty().isNumeric();
-    req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Pet.findByPk(req.params.pet_id).then((pet) => {
       if (!pet) return res.status(404).json({ success: false, errors: [{
         type: 'pet.transfer.not_found',

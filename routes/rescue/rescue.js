@@ -14,10 +14,14 @@ class Rescue extends BaseRoute{
   }
 
   detail(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.detail({ classname: 'Rescue', db: _this.db, req: req, res: res });
   }
 
   create(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Rescue.create({
       name: req.body.name,
       street_address: req.body.street_address,
@@ -31,8 +35,8 @@ class Rescue extends BaseRoute{
   }
 
   update(req, res) {
-    req.checkParams('rescue_id', 'A rescue id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Rescue.findByPk(req.params.rescue_id).then((rescue) => {
       if (!rescue) return res.status(404).json({ success: false, errors: [{
         type: 'rescue.update.not_found',
@@ -52,6 +56,8 @@ class Rescue extends BaseRoute{
   }
 
   delete(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.delete({ classname: 'Rescue', db: _this.db, req: req, res: res });
   }
 }

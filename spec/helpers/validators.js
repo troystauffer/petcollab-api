@@ -1,4 +1,4 @@
-global.validate = function(req, res, expectedResult, expectedStatus, execute) {
+global.validateRequest = function(req, res, expectedResult, expectedStatus, execute) {
   const validateResult = function(res) {
     if (res.hasOwnProperty("response")) {
       if (res.response.hasOwnProperty("response")) {

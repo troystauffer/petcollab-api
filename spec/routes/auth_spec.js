@@ -8,11 +8,10 @@ import Pwcrypt from '../util/pwcrypt';
 import PwcryptError from '../util/pwcrypt_error';
 import PwcryptInvalid from '../util/pwcrypt_invalid';
 import log from '../util/log';
-import HTTPS from '../util/https';
 import Encryption from '../util/encryption';
 
 describe('Auth', () => {
-  let res, req, authRoutes, pwcrypt, pwcryptError, pwcryptInvalid, https, jws = {};
+  let res, req, authRoutes, pwcrypt, pwcryptError, pwcryptInvalid, jws, expressValidate = {};
   let encryption = new Encryption();
   const config = { jws: { algorithm: 'fake' }};
 
@@ -22,53 +21,53 @@ describe('Auth', () => {
     pwcrypt = new Pwcrypt();
     pwcryptError = new PwcryptError();
     pwcryptInvalid = new PwcryptInvalid();
-    https = new HTTPS();
     jws = new JWS();
-    authRoutes = new Auth({ 'db': db, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'https': https, 'encryption': encryption });
+    expressValidate = () => { return { isEmpty: function() { return true }, array: function() { return [] }}};
+    authRoutes = new Auth({ db, pwcrypt, jws, config, log, encryption, validate: expressValidate });
   });
 
   describe('standard authentication', () => {
     it('should fail without email', () => {
       req.body = { password: 'password' };
       let validationErrors = [{ param: 'email', msg: 'Email is required.' }, { param: 'email', msg: 'Email must be a valid email address.' }];
-      req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutes.authenticate);
+      let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
+      let authRoutesFailures = new Auth({ db, pwcrypt, jws, config, log, encryption, validate: expressValidate });
+      validateRequest(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutesFailures.authenticate);
     });
 
     it('should fail without password', () => {
       req.body = { email: 'testunit@example.com' };
       let validationErrors = [{"param":"password","msg":"A valid password is required."}];
-      req.validationErrors = function() { return validationErrors };
-      validate(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutes.authenticate);
+      let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
+      let authRoutesFailures = new Auth({ db, pwcrypt, jws, config, log, encryption, validate: expressValidate });
+      validateRequest(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutesFailures.authenticate);
     });
 
     it('should fail on invalid email', () => {
-      let authRoutesFailures = new Auth({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log });
+      let authRoutesFailures = new Auth({ 'db': dbFailures, 'pwcrypt': pwcrypt, 'jws': jws, 'config': config, 'log': log, 'validate': expressValidate });
       req.body = {
         email: 'invalid@example.com',
         password: 'password'
       };
-      validate(req, res, {"success":false,"errors":[{"type":"auth.authenticate.user.not_found","message":"No such user."}]}, 400, authRoutesFailures.authenticate);
+      validateRequest(req, res, {"success":false,"errors":[{"type":"auth.authenticate.user.not_found","message":"No such user."}]}, 400, authRoutesFailures.authenticate);
     });
 
     it('should fail on tampered password hash', () => {
-      let authRoutesFailures = new Auth({ 'db': db, 'pwcrypt': pwcryptError, 'jws': jws, 'config': config, 'log': log });
+      let authRoutesFailures = new Auth({ 'db': db, 'pwcrypt': pwcryptError, 'jws': jws, 'config': config, 'log': log, 'validate': expressValidate });
       req.body = {
         email: 'testunit@example.com',
         password: 'tampered'
       };
-      validate(req, res, { success: false, errors: [{ type: 'auth.authenticate.password.invalid', message: 'An error occurred decrypting the password.' }]}, 500, authRoutesFailures.authenticate);
-      // expect(pwcryptError.calls.verify).toEqual(1);
+      validateRequest(req, res, { success: false, errors: [{ type: 'auth.authenticate.password.invalid', message: 'An error occurred decrypting the password.' }]}, 500, authRoutesFailures.authenticate);
     });
 
     it('should fail on incorrect password', () => {
-      let authRoutesFailures = new Auth({ 'db': db, 'pwcrypt': pwcryptInvalid, 'jws': jws, 'config': config, 'log': log });
+      let authRoutesFailures = new Auth({ 'db': db, 'pwcrypt': pwcryptInvalid, 'jws': jws, 'config': config, 'log': log, 'validate': expressValidate });
       req.body = {
         email: 'testunit@example.com',
         password: 'incorrect'
       };
-      validate(req, res, {"success":false,"errors":[{"type":"auth.authenticate.password.invalid","message":"Invalid password."}]}, 400, authRoutesFailures.authenticate);
-      expect(pwcryptInvalid.calls.verify).toEqual(1);
+      validateRequest(req, res, {"success":false,"errors":[{"type":"auth.authenticate.password.invalid","message":"Invalid password."}]}, 400, authRoutesFailures.authenticate);
     });
 
     it('should authenticate users', () => {
@@ -76,9 +75,7 @@ describe('Auth', () => {
         email: 'testunit@example.com',
         password: 'password'
       };
-      validate(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "encrypted", role: { id: 1, title: "user" }}}, 200, authRoutes.authenticate);
-      expect(pwcrypt.calls.verify).toEqual(1);
-      expect(jws.calls.sign).toEqual(1);
+      validateRequest(req, res, { success: true, "message": "Authenticated successfully.", response: {"token": "encrypted", role: { id: 1, title: "user" }}}, 200, authRoutes.authenticate);
     });
   });
 });

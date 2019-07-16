@@ -10,20 +10,21 @@ class Schedule extends BaseRoute {
   }
 
   list(req, res) {
-    req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.list({ classname: 'Schedule', foreignKeyClassname: 'event', foreignKeyValue: req.params.event_id,
       db: _this.db, res: res });
   }
 
   detail(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.detail({ classname: 'Schedule', db: _this.db, req: req, res: res });
   }
 
   create(req, res) {
-    req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
-    req.checkBody('title', 'Title is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Event.findByPk(req.params.event_id).then((event) => {
       if (!event) return res.status(404).json({ success: false, errors: [{
         type: 'schedule.create.not_found',
@@ -41,9 +42,8 @@ class Schedule extends BaseRoute {
   }
 
   update(req, res) {
-    req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
-    req.checkBody('title', 'Title is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Schedule.findByPk(req.params.schedule_id).then((schedule) => {
       if (!schedule) return res.status(404).json({ success: false, errors: [{
         type: 'schedule.update.not_found',
@@ -57,6 +57,8 @@ class Schedule extends BaseRoute {
   }
 
   delete(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.delete({ classname: 'Schedule', db: _this.db, req: req, res: res });
   }
 }

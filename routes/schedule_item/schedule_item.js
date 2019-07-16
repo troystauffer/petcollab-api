@@ -10,22 +10,21 @@ class ScheduleItem extends BaseRoute {
   }
 
   list(req, res) {
-    req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.list({ classname: 'ScheduleItem', foreignKeyClassname: 'Schedule', foreignKeyValue: req.params.schedule_id,
       db: _this.db, res: res });
   }
 
   detail(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.detail({ classname: 'ScheduleItem', db: _this.db, req: req, res: res });
   }
 
   create(req, res) {
-    req.checkParams('schedule_id', 'A schedule id is required.').notEmpty().isNumeric();
-    req.checkBody('assigned_user_id', 'User id must be numeric').isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    req.sanitizeBody('starts_at').toDate();
-    req.sanitizeBody('ends_at').toDate();
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Schedule.findByPk(req.params.schedule_id).then((schedule) => {
       if (!schedule) return res.status(404).json({ success: false, errors: [{
         type: 'schedule_item.create.not_found',
@@ -47,11 +46,8 @@ class ScheduleItem extends BaseRoute {
   }
 
   update(req, res) {
-    req.checkParams('schedule_item_id', 'A schedule item id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    req.sanitizeBody('starts_at').toDate();
-    req.sanitizeBody('ends_at').toDate();
-    req.sanitizeBody('checked_in_at').toDate();
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.ScheduleItem.findByPk(req.params.schedule_item_id).then((item) => {
       if (!item) return res.status(404).json({ success: false, errors: [{
         type: 'schedule_item.update.not_found',
@@ -72,6 +68,8 @@ class ScheduleItem extends BaseRoute {
   }
 
   delete(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.delete({ classname: 'ScheduleItem', db: _this.db, req: req, res: res });
   }
 }

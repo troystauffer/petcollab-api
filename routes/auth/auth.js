@@ -1,5 +1,4 @@
 import BaseRoute from '../base_route';
-
 let _this = {};
 
 class Auth extends BaseRoute {
@@ -9,10 +8,8 @@ class Auth extends BaseRoute {
   }
 
   authenticate(req, res) {
-    req.checkBody('email', 'Email is required.').notEmpty();
-    req.checkBody('email', 'Email must be a valid email address.').isEmail();
-    req.checkBody('password', 'A valid password is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.log.info('Attempting to authenticate ' + req.body.email);
     _this.db.User.findOne({ where: { email: req.body.email }, include: [ 'Role' ]}).then(function(user) {
       if (!user) {

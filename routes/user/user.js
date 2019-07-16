@@ -28,10 +28,8 @@ class User extends BaseRoute {
   }
 
   confirm(req, res) {
-    req.checkBody('confirmation_token', 'A valid confirmation token is required.')
-      .notEmpty().isAlphanumeric().isLength(_this.config.confirmationTokenLength);
-    req.checkBody('email', 'A valid email is required.').notEmpty().isEmail();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.User.findOne({ where: { email: req.body.email, confirmation_token: req.body.confirmation_token }})
       .then(function(user) {
         if (user) {
@@ -57,11 +55,8 @@ class User extends BaseRoute {
   }
 
   create(req, res, role) {
-    req.checkBody('email', 'Email is required.').notEmpty();
-    req.checkBody('email', 'Email must be a valid email address.').isEmail();
-    req.checkBody('password', 'A valid password is required.').notEmpty();
-    req.checkBody('name', 'A valid name is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.pwcrypt.secureHash(req.body.password, (err, passwordHash, salt) => {
       _this.log.info('secureHash');
       if (err) return res.status(500).json({success: false, errors: [{
@@ -125,6 +120,8 @@ class User extends BaseRoute {
   }
 
   delete(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     super.isAuthorized('user.delete', req.user.user_id, function(authorized) {
       if (!authorized) return res.status(403)
         .json({ success: false, message: 'Not authorized to view this resource.' });

@@ -18,8 +18,8 @@ class Event extends BaseRoute{
   }
 
   detail(req, res) {
-    req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     _this.db.Event.findByPk(req.params.event_id, { include: [
       { model: _this.db.Transfer, include: [_this.db.Pet]},
       { model: _this.db.Rescue, as:'ReleasingRescue' },
@@ -35,15 +35,8 @@ class Event extends BaseRoute{
   }
 
   create(req, res) {
-    req.checkBody('title', 'Title is required.').notEmpty();
-    req.checkBody('starts_at', 'Start date is required.').notEmpty();
-    req.checkBody('ends_at', 'End date is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    req.sanitizeBody('starts_at').toDate();
-    req.sanitizeBody('ends_at').toDate();
-    req.sanitizeBody('owner_user_id').toInt();
-    req.sanitizeBody('releasing_rescue_id').toInt();
-    req.sanitizeBody('receiving_rescue_id').toInt();
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     if (!req.body.starts_at) return res.status(400).json({ success: false, errors: [
       { type: 'event.create.starts_at.invalid', message: 'Invalid start date.' }
     ]});
@@ -66,15 +59,8 @@ class Event extends BaseRoute{
   }
 
   update(req, res) {
-    req.checkParams('event_id', 'An event id is required.').notEmpty().isNumeric();
-    req.checkBody('title', 'Title is required.').notEmpty();
-    req.checkBody('starts_at', 'Start date is required.').notEmpty();
-    req.checkBody('ends_at', 'End date is required.').notEmpty();
-    if (req.validationErrors()) return super.validationErrorResponse(res, req.validationErrors());
-    req.sanitizeBody('starts_at').toDate();
-    req.sanitizeBody('ends_at').toDate();
-    req.sanitizeBody('releasing_rescue_id').toInt();
-    req.sanitizeBody('receiving_rescue_id').toInt();
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     if (!req.body.starts_at) return res.status(400).json({ success: false, errors: [
       { type: 'event.update.starts_at.invalid', message: 'Invalid start date.' }
     ]});
@@ -101,6 +87,8 @@ class Event extends BaseRoute{
   }
 
   delete(req, res) {
+    const errors = _this.validate(req);
+    if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
     Crud.delete({ classname: 'Event', db: _this.db, req: req, res: res });
   }
 }

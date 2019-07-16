@@ -5,7 +5,8 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const router = express.Router();
-const validator = require('express-validator');
+const Validator = require('express-validator');
+const validationResult = Validator.validationResult;
 // configuration
 const config = new (require(path.join(__dirname, 'config/')));
 const unsecuredRoutes = require(path.join(__dirname, 'config/unsecured_routes'))(config.apiPrefix);
@@ -17,7 +18,6 @@ const bodyparser = require('body-parser');
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
 const jws = require('jws');
-const https = require('https');
 // persistance
 const db = new (require(path.join(__dirname, 'models/')))(config.database, log);
 // security
@@ -27,28 +27,41 @@ const UserToken = new (require(path.join(__dirname, 'lib/user_token')))(db, log)
 const encryption = new (require(path.join(__dirname, 'lib/encryption')))({ config: config.encryption });
 // custom middleware
 const authenticated = require(path.join(__dirname, 'lib/authenticated'))(jws, config.jws, encryption, log);
+const validate = validationResult.withDefaults({ formatter: (error) => {
+  return {
+    value: error.value,
+    message: error.msg,
+    param: error.param,
+    location: error.location
+  };
+}});
 
 function App() {
   EventEmitter.call(this);
   let self = this;
   app.use(bodyparser.urlencoded({ extended: true }));
   app.use(bodyparser.json());
-  app.use(validator());
   app.use(morgan(config.morgan.format, config.morgan.options));
   app.use(config.apiPrefix, router);
+
+  // allow cross domain requests
+  router.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
 
   router.use(authenticated.unless({ path: unsecuredRoutes }));
 
   // define routes
-  new (require(path.join(__dirname, 'routes/user')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'config': config,
-    'UserToken': UserToken, 'log': log });
-  new (require(path.join(__dirname, 'routes/auth')))(router, { 'db': db, 'pwcrypt': pwcrypt, 'jws': jws,
-    'config': config, 'encryption': encryption, 'log': log, 'https': https });
-  new (require(path.join(__dirname, 'routes/event')))(router, { 'db': db, 'log': log });
-  new (require(path.join(__dirname, 'routes/schedule')))(router, { 'db': db, 'log': log });
-  new (require(path.join(__dirname, 'routes/schedule_item')))(router, { 'db': db, 'log': log });
-  new (require(path.join(__dirname, 'routes/pet')))(router, { 'db': db, 'log': log });
-  new (require(path.join(__dirname, 'routes/rescue')))(router, { 'db': db, 'log': log });
+  const routeArgs = { db, pwcrypt, config, UserToken, log, jws, encryption, validate };
+  new (require(path.join(__dirname, 'routes/user')))(router, routeArgs);
+  new (require(path.join(__dirname, 'routes/auth')))(router, routeArgs);
+  new (require(path.join(__dirname, 'routes/event')))(router, routeArgs);
+  new (require(path.join(__dirname, 'routes/schedule')))(router, routeArgs);
+  new (require(path.join(__dirname, 'routes/schedule_item')))(router, routeArgs);
+  new (require(path.join(__dirname, 'routes/pet')))(router, routeArgs);
+  new (require(path.join(__dirname, 'routes/rescue')))(router, routeArgs);
 
   let server = app.listen(config.port);
   log.info('Web app started on port ' + config.port + '...');
