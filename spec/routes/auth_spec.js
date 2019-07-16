@@ -29,7 +29,7 @@ describe('Auth', () => {
   describe('standard authentication', () => {
     it('should fail without email', () => {
       req.body = { password: 'password' };
-      let validationErrors = [{ param: 'email', msg: 'Email is required.' }, { param: 'email', msg: 'Email must be a valid email address.' }];
+      let validationErrors = [{ param: 'email', message: 'Email is required.' }, { param: 'email', message: 'Email must be a valid email address.' }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let authRoutesFailures = new Auth({ db, pwcrypt, jws, config, log, encryption, validate: expressValidate });
       validateRequest(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutesFailures.authenticate);
@@ -37,7 +37,7 @@ describe('Auth', () => {
 
     it('should fail without password', () => {
       req.body = { email: 'testunit@example.com' };
-      let validationErrors = [{"param":"password","msg":"A valid password is required."}];
+      let validationErrors = [{"param":"password","message":"A valid password is required."}];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let authRoutesFailures = new Auth({ db, pwcrypt, jws, config, log, encryption, validate: expressValidate });
       validateRequest(req, res, {success:false, "message":"The data provided to the API was invalid or incomplete.","errors":validationErrors}, 400, authRoutesFailures.authenticate);

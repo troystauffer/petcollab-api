@@ -32,7 +32,7 @@ describe('Rescue', () => {
 
   describe('details', () => {
     it('should fail without an id', () => {
-      let validationErrors = [{ "param": "id", "msg": "A rescue id is required." }];
+      let validationErrors = [{ "param": "id", "message": "A rescue id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let rescueRoutesFailure = new Rescue({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, rescueRoutesFailure.detail);
@@ -51,7 +51,7 @@ describe('Rescue', () => {
   describe('editing', () => {
     it('should fail with an invalid id', () => {
       req.params = { rescue_id: 'asdf' };
-      let validationErrors = [{ "param": "id", "msg": "A rescue id is required." }];
+      let validationErrors = [{ "param": "id", "message": "A rescue id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let rescueRoutesFailure = new Rescue({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, rescueRoutesFailure.update);

@@ -26,7 +26,7 @@ describe('Pet', () => {
 
   describe('creation', () => {
     it('should fail without an pet name', () => {
-      let validationErrors = [{ "param": "name", "msg": "Name is required." }];
+      let validationErrors = [{ "param": "name", "message": "Name is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.create);
@@ -45,7 +45,7 @@ describe('Pet', () => {
 
   describe('details', () => {
     it('should fail without an id', () => {
-      let validationErrors = [{ "param": "id", "msg": "A pet id is required." }];
+      let validationErrors = [{ "param": "id", "message": "A pet id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.detail);
@@ -65,7 +65,7 @@ describe('Pet', () => {
     it('should fail with an invalid id', () => {
       req.params = { id: 'asdf' };
       req.body = {};
-      let validationErrors = [{ "param": "id", "msg": "A pet id is required." }];
+      let validationErrors = [{ "param": "id", "message": "A pet id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.update);
@@ -76,7 +76,7 @@ describe('Pet', () => {
         start_at: '2017-04-15 12:00:00 GMT',
         ends_at: '2017-04-16 12:00:00 GMT'
       };
-      let validationErrors = [{ "param": "name", "msg": "Name is required." }];
+      let validationErrors = [{ "param": "name", "message": "Name is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.update);
@@ -107,14 +107,14 @@ describe('Pet', () => {
 
   describe('tranferring', () => {
     it('should fail without a pet id', () => {
-      let validationErrors = [{ "param": "id", "msg": "A pet id is required." }];
+      let validationErrors = [{ "param": "id", "message": "A pet id is required." }];
       req.params = { event_id: 1 };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.transfer);
     });
     it('should fail without an event id', () => {
-      let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
+      let validationErrors = [{ "param": "id", "message": "An event id is required." }];
       req.params = { pet_id: 1 };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let petRoutesFailure = new Pet({ db, log, validate: expressValidate});

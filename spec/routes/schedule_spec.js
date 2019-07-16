@@ -17,7 +17,7 @@ describe('Schedule', () => {
 
   describe('listing', () => {
     it('should fail without an id', () => {
-      let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
+      let validationErrors = [{ "param": "id", "message": "An event id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let scheduleRoutesFailure = new Schedule({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutesFailure.list);
@@ -36,7 +36,7 @@ describe('Schedule', () => {
   describe('creation', () => {
     it('should fail without a title', () => {
       req.params = { event_id: 1 };
-      let validationErrors = [{ "param": "title", "msg": "Title is required." }];
+      let validationErrors = [{ "param": "title", "message": "Title is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let scheduleRoutesFailure = new Schedule({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutesFailure.create);
@@ -55,7 +55,7 @@ describe('Schedule', () => {
 
   describe('details', () => {
     it('should fail without an id', () => {
-      let validationErrors = [{ "param": "schedule_id", "msg": "A schedule id is required." }];
+      let validationErrors = [{ "param": "schedule_id", "message": "A schedule id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let scheduleRoutesFailure = new Schedule({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutesFailure.detail);
@@ -74,14 +74,14 @@ describe('Schedule', () => {
   describe('editing', () => {
     it('should fail with an invalid id', () => {
       req.params = { schedule_id: 'asdf' };
-      let validationErrors = [{ "param": "schedule_id", "msg": "A schedule id is required." }];
+      let validationErrors = [{ "param": "schedule_id", "message": "A schedule id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let scheduleRoutesFailure = new Schedule({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutesFailure.update);
     });
     it('should fail without a schedule title', () => {
       req.body = {};
-      let validationErrors = [{ "param": "title", "msg": "Title is required." }];
+      let validationErrors = [{ "param": "title", "message": "Title is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let scheduleRoutesFailure = new Schedule({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleRoutesFailure.update);

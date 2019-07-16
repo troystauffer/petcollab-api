@@ -37,7 +37,7 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      let validationErrors = [{ "param": "email", "msg": "Email is required." }, { "param": "email", "msg": "Email must be a valid email address." }];
+      let validationErrors = [{ "param": "email", "message": "Email is required." }, { "param": "email", "message": "Email must be a valid email address." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
@@ -48,7 +48,7 @@ describe('User', () => {
         email: 'testunit@example.com',
         name: 'Test Unit'
       };
-      let validationErrors = { "param": "password", "msg": "Password is required." };
+      let validationErrors = { "param": "password", "message": "Password is required." };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
@@ -59,7 +59,7 @@ describe('User', () => {
         email: 'testunit@example.com',
         password: 'password'
       };
-      let validationErrors = { "param": "name", "msg": "Name is required." };
+      let validationErrors = { "param": "name", "message": "Name is required." };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
@@ -71,7 +71,7 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      let validationErrors = { "param": "email", "msg": "Email must be a valid email address." };
+      let validationErrors = { "param": "email", "message": "Email must be a valid email address." };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
@@ -129,7 +129,7 @@ describe('User', () => {
   describe('confirmation', () => {
     it('should fail without a confirmation token', () => {
       req.body = { email: 'testunit@example.com' };
-      let validationErrors = {"param":"confirmation_token","msg":"A valid confirmation token is required."};
+      let validationErrors = {"param":"confirmation_token","message":"A valid confirmation token is required."};
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
       validateRequest(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutesFailure.confirm);
@@ -137,7 +137,7 @@ describe('User', () => {
 
     it('should fail without an email address', () => {
       req.body = { confirmation_token: 'asdf' };
-      let validationErrors = [{"param":"email","msg":"A valid email is required."},{"param":"email","msg":"A valid email is required."}];
+      let validationErrors = [{"param":"email","message":"A valid email is required."},{"param":"email","message":"A valid email is required."}];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
       validateRequest(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutesFailure.confirm);

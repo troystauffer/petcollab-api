@@ -30,7 +30,7 @@ describe('Event', () => {
         start_at: '2017-04-15 12:00:00 GMT',
         ends_at: '2017-04-16 12:00:00 GMT'
       };
-      let validationErrors = [{ "param": "title", "msg": "Title is required." }];
+      let validationErrors = [{ "param": "title", "message": "Title is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.create);
@@ -40,7 +40,7 @@ describe('Event', () => {
         title: 'Test Event',
         ends_at: '2017-04-16 12:00:00 GMT'
       };
-      let validationErrors = [{ "param": "starts_at", "msg": "Start date is required." }];
+      let validationErrors = [{ "param": "starts_at", "message": "Start date is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.create);
@@ -50,7 +50,7 @@ describe('Event', () => {
         title: 'Test Event',
         starts_at: '2017-04-16 12:00:00 GMT'
       };
-      let validationErrors = [{ "param": "ends_at", "msg": "End date is required." }];
+      let validationErrors = [{ "param": "ends_at", "message": "End date is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.create);
@@ -85,7 +85,7 @@ describe('Event', () => {
 
   describe('details', () => {
     it('should fail without an id', () => {
-      let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
+      let validationErrors = [{ "param": "id", "message": "An event id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.detail);
@@ -105,7 +105,7 @@ describe('Event', () => {
   describe('editing', () => {
     it('should fail with an invalid id', () => {
       req.params = { id: 'asdf' };
-      let validationErrors = [{ "param": "id", "msg": "An event id is required." }];
+      let validationErrors = [{ "param": "id", "message": "An event id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.update);
@@ -115,7 +115,7 @@ describe('Event', () => {
         start_at: '2017-04-15 12:00:00 GMT',
         ends_at: '2017-04-16 12:00:00 GMT'
       };
-      let validationErrors = [{ "param": "title", "msg": "Title is required." }];
+      let validationErrors = [{ "param": "title", "message": "Title is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
       let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.update);
