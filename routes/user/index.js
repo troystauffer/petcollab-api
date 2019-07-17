@@ -9,7 +9,7 @@ class UserRoutes {
       check('email').not().isEmpty().withMessage('Email is required.'),
       check('email').isEmail().withMessage('Email must be a valid email address.'),
       check('password').not().isEmpty().withMessage('A valid password is required.'),
-      check('name').not().isEmpty().withMessage('A valid password is required.')
+      check('name').not().isEmpty().withMessage('A valid name is required.')
     ], user.createUser);
     router.post('/users/confirm.:format?', [
       check('confirmation_token').not().isEmpty().withMessage('A valid confirmation token is required.'),

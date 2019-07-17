@@ -4,15 +4,17 @@ import Req from '../util/req';
 import db from '../util/db';
 import dbFailures from '../util/db_failures';
 import log from '../util/log';
+import Crud from '../../lib/crud';
 
 describe('Pet', () => {
-  let res, req, petRoutes, expressValidate = {};
+  let res, req, petRoutes, expressValidate, crud = {};
 
   beforeEach(() => {
     res = new Res();
     req = new Req();
     expressValidate = () => { return { isEmpty: function() { return true }, array: function() { return [] }}};
-    petRoutes = new Pet({ db, log, validate: expressValidate });
+    crud = new Crud({ db: db, validate: expressValidate });
+    petRoutes = new Pet({ db, log, validate: expressValidate, crud });
   })
 
   describe('listing', () => {
@@ -28,7 +30,7 @@ describe('Pet', () => {
     it('should fail without an pet name', () => {
       let validationErrors = [{ "param": "name", "message": "Name is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
+      let petRoutesFailure = new Pet({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.create);
     });
     it('should create a pet', () => {
@@ -47,12 +49,13 @@ describe('Pet', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "message": "A pet id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
+      let petRoutesFailure = new Pet({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.detail);
     });
     it('should return a 404 when provided an id not in the database', () => {
       req.params = { id: 1 };
-      let petRoutesFailure = new Pet({ 'db': dbFailures, log, validate: expressValidate });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let petRoutesFailure = new Pet({ 'db': dbFailures, log, validate: expressValidate, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"pet.detail.not_found","message":"No pet found for provided id."}]}, 404, petRoutesFailure.detail);
     });
     it('should display the details of an pet', () => {
@@ -67,7 +70,7 @@ describe('Pet', () => {
       req.body = {};
       let validationErrors = [{ "param": "id", "message": "A pet id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
+      let petRoutesFailure = new Pet({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.update);
     });
     it('should fail without a pet name', () => {
@@ -78,7 +81,7 @@ describe('Pet', () => {
       };
       let validationErrors = [{ "param": "name", "message": "Name is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
+      let petRoutesFailure = new Pet({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.update);
     });
     it('should update an pet', () => {
@@ -96,7 +99,8 @@ describe('Pet', () => {
   describe('deleting', () => {
     it('should return a 404 when given an invalid pet id', () => {
       req.params = { pet_id: 1 };
-      let petRoutesFailure = new Pet({ 'db': dbFailures, 'log': log });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let petRoutesFailure = new Pet({ 'db': dbFailures, log, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"pet.delete.not_found","message":"No pet found for provided id."}]}, 404, petRoutesFailure.delete);
     });
     it('should delete an pet', () => {
@@ -110,19 +114,19 @@ describe('Pet', () => {
       let validationErrors = [{ "param": "id", "message": "A pet id is required." }];
       req.params = { event_id: 1 };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
+      let petRoutesFailure = new Pet({ db, log, validate: expressValidate, crud});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.transfer);
     });
     it('should fail without an event id', () => {
       let validationErrors = [{ "param": "id", "message": "An event id is required." }];
       req.params = { pet_id: 1 };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let petRoutesFailure = new Pet({ db, log, validate: expressValidate});
+      let petRoutesFailure = new Pet({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, petRoutesFailure.transfer);
     });
     it('should return a 404 when given an invalid pet id', () => {
       req.params = { pet_id: 1 };
-      let petRoutesFailure = new Pet({ 'db': dbFailures, log, validate: expressValidate });
+      let petRoutesFailure = new Pet({ 'db': dbFailures, log, validate: expressValidate, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"pet.transfer.not_found","message":"No pet found for provided id."}]}, 404, petRoutesFailure.transfer);
     });
     it('should create a transfer', () => {

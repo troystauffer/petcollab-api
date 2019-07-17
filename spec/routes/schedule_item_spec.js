@@ -4,24 +4,28 @@ import Req from '../util/req';
 import db from '../util/db';
 import dbFailures from '../util/db_failures';
 import log from '../util/log';
+import Crud from '../../lib/crud';
 
 describe('Schedule item', () => {
-  let res, req, scheduleItemRoutes, expressValidate = {};
+  let res, req, scheduleItemRoutes, expressValidate, crud = {};
 
   beforeEach(() => {
     res = new Res();
     req = new Req();
     expressValidate = () => { return { isEmpty: function() { return true }, array: function() { return [] }}};
-    scheduleItemRoutes = new ScheduleItem({ db, log, validate: expressValidate });
+    crud = new Crud({ db: db, validate: expressValidate });
+    scheduleItemRoutes = new ScheduleItem({ db, log, validate: expressValidate, crud });
   })
 
   describe('listing', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "message": "A schedule id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate});
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate, crud});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutesFailure.list);
     });
+
     it('should return a list of schedule items', () => {
       req.params = { schedule_id: 1 }
       let items = [{
@@ -42,7 +46,7 @@ describe('Schedule item', () => {
       req.params = {};
       let validationErrors = [{ "param": "id", "message": "Schedule id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate});
+      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate, crud});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutesFailure.create);
     });
     it('should return a 404 when provided an invalid schedule id', () => {
@@ -68,12 +72,13 @@ describe('Schedule item', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "message": "A schedule item id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate});
+      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate, crud});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutesFailure.detail);
     });
     it('should return a 404 when provided an id not in the database', () => {
       req.params = { id: 1 };
-      let scheduleItemRoutesFailure = new ScheduleItem({ 'db': dbFailures, 'log': log });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let scheduleItemRoutesFailure = new ScheduleItem({ 'db': dbFailures, log, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"schedule_item.detail.not_found","message":"No schedule_item found for provided id."}]}, 404, scheduleItemRoutesFailure.detail);
     });
     it('should display the details of an event', () => {
@@ -87,7 +92,7 @@ describe('Schedule item', () => {
       req.params = { id: 'asdf' };
       let validationErrors = [{ "param": "id", "message": "A schedule item id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate});
+      let scheduleItemRoutesFailure = new ScheduleItem({ db, log, validate: expressValidate, crud});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, scheduleItemRoutesFailure.update);
     });
     it('should update a schedule item', () => {
@@ -106,7 +111,8 @@ describe('Schedule item', () => {
   describe('deleting', () => {
     it('should return a 404 when given an invalid schedule item id', () => {
       req.params = { id: 1 };
-      let scheduleItemRoutesFailure = new ScheduleItem({ 'db': dbFailures, 'log': log });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let scheduleItemRoutesFailure = new ScheduleItem({ 'db': dbFailures, log, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"schedule_item.delete.not_found","message":"No schedule_item found for provided id."}]}, 404, scheduleItemRoutesFailure.delete);
     });
     it('should delete a schedule item', () => {

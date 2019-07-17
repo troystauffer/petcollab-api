@@ -1,5 +1,4 @@
 import BaseRoute from '../base_route';
-import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -89,7 +88,7 @@ class Event extends BaseRoute{
   delete(req, res) {
     const errors = _this.validate(req);
     if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
-    Crud.delete({ classname: 'Event', db: _this.db, req: req, res: res });
+    _this.crud.delete({ classname: 'Event', req: req, res: res });
   }
 }
 

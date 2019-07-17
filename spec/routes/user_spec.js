@@ -7,9 +7,10 @@ import dbFailures from '../util/db_failures';
 import Pwcrypt from '../util/pwcrypt';
 import UserToken from '../util/user_token';
 import log from '../util/log';
+import Crud from '../../lib/crud';
 
 describe('User', () => {
-  let res, req, userRoutes, pwcrypt, userToken, expressValidate = {};
+  let res, req, userRoutes, pwcrypt, userToken, expressValidate, crud = {};
   const config = { 'confirmationTokenLength': 6 };
 
   beforeEach(() => {
@@ -18,7 +19,8 @@ describe('User', () => {
     pwcrypt = new Pwcrypt();
     userToken = new UserToken();
     expressValidate = () => { return { isEmpty: function() { return true }, array: function() { return [] }}};
-    userRoutes = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
+    crud = new Crud({ db: db, validate: expressValidate });
+    userRoutes = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate, crud });
   })
 
   describe('misc endpoints', () => {
@@ -39,7 +41,7 @@ describe('User', () => {
       };
       let validationErrors = [{ "param": "email", "message": "Email is required." }, { "param": "email", "message": "Email must be a valid email address." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
+      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
     });
 
@@ -50,7 +52,7 @@ describe('User', () => {
       };
       let validationErrors = { "param": "password", "message": "Password is required." };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
+      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
     });
 
@@ -61,7 +63,7 @@ describe('User', () => {
       };
       let validationErrors = { "param": "name", "message": "Name is required." };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
+      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
     });
 
@@ -73,7 +75,7 @@ describe('User', () => {
       };
       let validationErrors = { "param": "email", "message": "Email must be a valid email address." };
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
+      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, "message": "The data provided to the API was invalid or incomplete.", errors: validationErrors}, 400, userRoutesFailure.create);
     });
 
@@ -83,11 +85,11 @@ describe('User', () => {
         password: 'password',
         name: 'Test Unit'
       };
-      validateRequest(req, res, { success: true, "message": "Account updated successfully.", response: { confirmation_token: "token" }}, 201, userRoutes.createUser);
+      validateRequest(req, res, { success: true, "message": "Account created successfully." }, 201, userRoutes.createUser);
     });
 
     it('should prevent duplicate email addresses', () => {
-      let userRoutesFailure = new UserRoutes({ 'db': dbFailures, pwcrypt, config, UserToken, log, validate: expressValidate });
+      let userRoutesFailure = new UserRoutes({ 'db': dbFailures, pwcrypt, config, UserToken, log, validate: expressValidate, crud });
       req.body = {
         email: 'duplicate@example.com',
         password: 'password',
@@ -113,14 +115,14 @@ describe('User', () => {
       it('should fail for a non-admin user', () => {
         let standardUserDb = Object.assign({}, db);
         standardUserDb.User = standardUserDb.StandardUser;
-        let standardUserRoutes = new UserRoutes({ 'db': standardUserDb, pwcrypt, config, UserToken, log, validate: expressValidate });
+        let standardUserRoutes = new UserRoutes({ 'db': standardUserDb, pwcrypt, config, UserToken, log, validate: expressValidate, crud });
         validateRequest(req, res, {success: false, "message":"Not authorized to view this resource."}, 403, standardUserRoutes.list);
       });
 
       it('should work for a super admin user', () => {
         let superAdminUserDb = Object.assign({}, db);
         superAdminUserDb.User = superAdminUserDb.SuperAdminUser;
-        let superAdminUserRoutes = new UserRoutes({ 'db': superAdminUserDb, pwcrypt, config, UserToken, log, validate: expressValidate });
+        let superAdminUserRoutes = new UserRoutes({ 'db': superAdminUserDb, pwcrypt, config, UserToken, log, validate: expressValidate, crud });
         validateRequest(req, res, {success: true, response: [{ id: 1 }]}, 200, superAdminUserRoutes.list);
       });
     });
@@ -131,7 +133,7 @@ describe('User', () => {
       req.body = { email: 'testunit@example.com' };
       let validationErrors = {"param":"confirmation_token","message":"A valid confirmation token is required."};
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
+      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate, crud });
       validateRequest(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutesFailure.confirm);
     });
 
@@ -139,7 +141,7 @@ describe('User', () => {
       req.body = { confirmation_token: 'asdf' };
       let validationErrors = [{"param":"email","message":"A valid email is required."},{"param":"email","message":"A valid email is required."}];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate });
+      let userRoutesFailure = new UserRoutes({ db, pwcrypt, config, UserToken: userToken, log, validate: expressValidate, crud });
       validateRequest(req, res, {success: false, "message":"The data provided to the API was invalid or incomplete.",errors: validationErrors}, 400, userRoutesFailure.confirm);
     });
 

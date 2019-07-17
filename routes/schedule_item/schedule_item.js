@@ -1,5 +1,4 @@
 import BaseRoute from '../base_route';
-import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -12,14 +11,14 @@ class ScheduleItem extends BaseRoute {
   list(req, res) {
     const errors = _this.validate(req);
     if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
-    Crud.list({ classname: 'ScheduleItem', foreignKeyClassname: 'Schedule', foreignKeyValue: req.params.schedule_id,
-      db: _this.db, res: res });
+    _this.crud.list({ classname: 'ScheduleItem', foreignKeyClassname: 'Schedule',
+      foreignKeyValue: req.params.schedule_id, res: res });
   }
 
   detail(req, res) {
     const errors = _this.validate(req);
     if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
-    Crud.detail({ classname: 'ScheduleItem', db: _this.db, req: req, res: res });
+    _this.crud.detail({ classname: 'ScheduleItem', req: req, res: res });
   }
 
   create(req, res) {
@@ -70,7 +69,7 @@ class ScheduleItem extends BaseRoute {
   delete(req, res) {
     const errors = _this.validate(req);
     if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
-    Crud.delete({ classname: 'ScheduleItem', db: _this.db, req: req, res: res });
+    _this.crud.delete({ classname: 'ScheduleItem', req: req, res: res });
   }
 }
 

@@ -1,6 +1,5 @@
 import BaseRoute from '../base_route';
 import _ from 'lodash';
-import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -78,7 +77,7 @@ class Pet extends BaseRoute{
   delete(req, res) {
     const errors = _this.validate(req);
     if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
-    Crud.delete({ classname: 'Pet', db: _this.db, req: req, res: res });
+    _this.crud.delete({ classname: 'Pet', req: req, res: res });
   }
 
   transfer(req, res) {

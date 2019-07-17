@@ -35,6 +35,7 @@ const validate = validationResult.withDefaults({ formatter: (error) => {
     location: error.location
   };
 }});
+const crud = new (require(path.join(__dirname, 'lib/crud')))({ db: db, validate: validate });
 
 function App() {
   EventEmitter.call(this);
@@ -54,7 +55,7 @@ function App() {
   router.use(authenticated.unless({ path: unsecuredRoutes }));
 
   // define routes
-  const routeArgs = { db, pwcrypt, config, UserToken, log, jws, encryption, validate };
+  const routeArgs = { db, pwcrypt, config, UserToken, log, jws, encryption, validate, crud };
   new (require(path.join(__dirname, 'routes/user')))(router, routeArgs);
   new (require(path.join(__dirname, 'routes/auth')))(router, routeArgs);
   new (require(path.join(__dirname, 'routes/event')))(router, routeArgs);

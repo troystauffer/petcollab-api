@@ -4,15 +4,17 @@ import Req from '../util/req';
 import db from '../util/db';
 import dbFailures from '../util/db_failures';
 import log from '../util/log';
+import Crud from '../../lib/crud';
 
 describe('Rescue', () => {
-  let res, req, rescueRoutes, expressValidate = {};
+  let res, req, rescueRoutes, expressValidate, crud = {};
 
   beforeEach(() => {
     res = new Res();
     req = new Req();
     expressValidate = () => { return { isEmpty: function() { return true }, array: function() { return [] }}};
-    rescueRoutes = new Rescue({ db, log, validate: expressValidate });
+    crud = new Crud({ db: db, validate: expressValidate });
+    rescueRoutes = new Rescue({ db, log, validate: expressValidate, crud });
   })
 
   describe('listing', () => {
@@ -34,12 +36,13 @@ describe('Rescue', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "message": "A rescue id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let rescueRoutesFailure = new Rescue({ db, log, validate: expressValidate});
+      let rescueRoutesFailure = new Rescue({ db, log, validate: expressValidate, crud});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, rescueRoutesFailure.detail);
     });
     it('should return a 404 when provided an id not in the database', () => {
       req.params = { rescue_id: 1 };
-      let rescueRoutesFailure = new Rescue({ 'db': dbFailures, 'log': log });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let rescueRoutesFailure = new Rescue({ 'db': dbFailures, log, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"rescue.detail.not_found","message":"No rescue found for provided id."}]}, 404, rescueRoutesFailure.detail);
     });
     it('should display the details of an rescue', () => {
@@ -53,7 +56,7 @@ describe('Rescue', () => {
       req.params = { rescue_id: 'asdf' };
       let validationErrors = [{ "param": "id", "message": "A rescue id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let rescueRoutesFailure = new Rescue({ db, log, validate: expressValidate});
+      let rescueRoutesFailure = new Rescue({ db, log, validate: expressValidate, crud});
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, rescueRoutesFailure.update);
     });
     it('should update an rescue', () => {
@@ -67,7 +70,8 @@ describe('Rescue', () => {
   describe('deleting', () => {
     it('should return a 404 when given an invalid rescue id', () => {
       req.params = { rescue_id: 1 };
-      let rescueRoutesFailure = new Rescue({ 'db': dbFailures, 'log': log });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let rescueRoutesFailure = new Rescue({ 'db': dbFailures, log, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"rescue.delete.not_found","message":"No rescue found for provided id."}]}, 404, rescueRoutesFailure.delete);
     });
     it('should delete an rescue', () => {

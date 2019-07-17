@@ -4,15 +4,17 @@ import Req from '../util/req';
 import db from '../util/db';
 import dbFailures from '../util/db_failures';
 import log from '../util/log';
+import Crud from '../../lib/crud';
 
 describe('Event', () => {
-  let res, req, eventRoutes, expressValidate = {};
+  let res, req, eventRoutes, expressValidate, crud = {};
 
   beforeEach(() => {
     res = new Res();
     req = new Req();
     expressValidate = () => { return { isEmpty: function() { return true }, array: function() { return [] }}};
-    eventRoutes = new Event({ db, log, validate: expressValidate });
+    crud = new Crud({ db: db, validate: expressValidate });
+    eventRoutes = new Event({ db, log, validate: expressValidate, crud });
   })
 
   describe('listing', () => {
@@ -32,7 +34,7 @@ describe('Event', () => {
       };
       let validationErrors = [{ "param": "title", "message": "Title is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
+      let eventRoutesFailure = new Event({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.create);
     });
     it('should fail without a start date', () => {
@@ -42,7 +44,7 @@ describe('Event', () => {
       };
       let validationErrors = [{ "param": "starts_at", "message": "Start date is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
+      let eventRoutesFailure = new Event({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.create);
     });
     it('should fail without an end date', () => {
@@ -52,7 +54,7 @@ describe('Event', () => {
       };
       let validationErrors = [{ "param": "ends_at", "message": "End date is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
+      let eventRoutesFailure = new Event({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.create);
     });
     it('should fail with invalid start date', () => {
@@ -87,12 +89,13 @@ describe('Event', () => {
     it('should fail without an id', () => {
       let validationErrors = [{ "param": "id", "message": "An event id is required." }];
       let expressValidate = () => { return { isEmpty: function() { return false }, array: function() { return validationErrors }}};
-      let eventRoutesFailure = new Event({ db, log, validate: expressValidate});
+      let eventRoutesFailure = new Event({ db, log, validate: expressValidate, crud });
       validateRequest(req, res, { success: false, message: 'The data provided to the API was invalid or incomplete.', errors: validationErrors }, 400, eventRoutesFailure.detail);
     });
     it('should return a 404 when provided an id not in the database', () => {
       req.params = { id: 1 };
-      let eventRoutesFailure = new Event({ 'db': dbFailures, 'log': log, 'validate': expressValidate });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let eventRoutesFailure = new Event({ 'db': dbFailures, log, 'validate': expressValidate, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"event.detail.not_found","message":"No event found for provided id."}]}, 404, eventRoutesFailure.detail);
     });
     it('should display the details of an event', () => {
@@ -151,7 +154,8 @@ describe('Event', () => {
   describe('deleting', () => {
     it('should return a 404 when given an invalid event id', () => {
       req.params = { event_id: 1 };
-      let eventRoutesFailure = new Event({ 'db': dbFailures, log, validate: expressValidate });
+      let crud = new Crud({ db: dbFailures, validate: expressValidate });
+      let eventRoutesFailure = new Event({ 'db': dbFailures, log, validate: expressValidate, crud });
       validateRequest(req, res, {"success":false,"errors":[{"type":"event.delete.not_found","message":"No event found for provided id."}]}, 404, eventRoutesFailure.delete);
     });
     it('should delete an event', () => {

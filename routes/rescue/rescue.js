@@ -1,5 +1,4 @@
 import BaseRoute from '../base_route';
-import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -10,13 +9,13 @@ class Rescue extends BaseRoute{
   }
 
   list(req, res) {
-    Crud.list({ classname: 'Rescue', db: _this.db, res: res });
+    _this.crud.list({ classname: 'Rescue', res: res });
   }
 
   detail(req, res) {
     const errors = _this.validate(req);
     if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
-    Crud.detail({ classname: 'Rescue', db: _this.db, req: req, res: res });
+    _this.crud.detail({ classname: 'Rescue', req: req, res: res });
   }
 
   create(req, res) {
@@ -58,7 +57,7 @@ class Rescue extends BaseRoute{
   delete(req, res) {
     const errors = _this.validate(req);
     if (!errors.isEmpty()) return super.validationErrorResponse(res, errors.array());
-    Crud.delete({ classname: 'Rescue', db: _this.db, req: req, res: res });
+    _this.crud.delete({ classname: 'Rescue', req: req, res: res });
   }
 }
 

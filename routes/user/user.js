@@ -1,5 +1,4 @@
 import BaseRoute from '../base_route';
-import Crud from '../../lib/crud';
 
 let _this = {};
 
@@ -79,9 +78,7 @@ class User extends BaseRoute {
           user.confirmation_token = token;
           user.role_id = role.id;
           user.save().then(function() {
-            return res.status(201).json({success: true, message: 'Account updated successfully.', response: {
-              confirmation_token: token
-            }});
+            return res.status(201).json({success: true, message: 'Account created successfully.'});
           });
         });
       });
@@ -125,7 +122,7 @@ class User extends BaseRoute {
     super.isAuthorized('user.delete', req.user.user_id, function(authorized) {
       if (!authorized) return res.status(403)
         .json({ success: false, message: 'Not authorized to view this resource.' });
-      Crud.delete({ classname: 'User', db: _this.db, req: req, res: res });
+      _this.crud.delete({ classname: 'User', db: _this.db, req: req, res: res });
     });
   }
 }
